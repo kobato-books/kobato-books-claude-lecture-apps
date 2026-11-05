@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>第21回 ミニ言語モデルを育てる｜チャピのAI講義室</title>
+<style>
+:root{--bg:#eef2f6;--grid:#dde5ee;--ink:#1b2a41;--sub:#5b6b80;--card:#fbfcfe;--line:#c7d2df;--acc:#0f7b8a;--acc2:#e0483d;--accfg:#fff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121a26;--grid:#1a2432;--ink:#e6edf6;--sub:#93a3b8;--card:#18212e;--line:#2c394b;--acc:#4cc3d3;--acc2:#ff7a6e;--accfg:#08222a}}
+:root[data-theme="dark"]{--bg:#121a26;--grid:#1a2432;--ink:#e6edf6;--sub:#93a3b8;--card:#18212e;--line:#2c394b;--acc:#4cc3d3;--acc2:#ff7a6e;--accfg:#08222a}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background-color:var(--bg);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:24px 24px;color:var(--ink);font-family:"Hiragino Sans","Yu Gothic","Noto Sans JP",system-ui,sans-serif;line-height:1.75}
+main{max-width:760px;margin:0 auto;padding:28px 16px 64px}
+h1{font-size:1.6rem;margin:0 0 4px}
+h2{font-size:1.1rem;margin:26px 0 8px}
+.lead{color:var(--sub);margin:0 0 16px;font-size:.95rem}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:16px;margin-bottom:12px}
+.cap{font-size:.82rem;color:var(--sub);margin:0 0 6px}
+.note{font-size:.9rem;color:var(--sub);margin:8px 0 0}
+.serif{font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif}
+.live{font-size:1.3rem;line-height:1.9;min-height:3.8em;white-space:pre-wrap;word-break:break-all}
+.stats{display:flex;gap:24px;flex-wrap:wrap;margin-bottom:8px}
+.stats b{font-size:1.3rem;font-variant-numeric:tabular-nums}
+canvas{display:block}
+#cv{width:100%;height:170px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+button{font:inherit;border:1px solid var(--ink);background:transparent;color:var(--ink);padding:7px 14px;border-radius:4px;cursor:pointer}
+button.primary{background:var(--acc);border-color:var(--acc);color:var(--accfg);font-weight:600}
+button:disabled{opacity:.45;cursor:default}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--acc2);outline-offset:2px}
+label{font-size:.85rem;color:var(--sub);display:flex;align-items:center;gap:8px}
+input[type=range]{accent-color:var(--acc)}
+input[type=text],select{font:inherit;padding:7px 10px;border:1px solid var(--line);border-radius:4px;background:var(--bg);color:var(--ink)}
+textarea{width:100%;font:inherit;padding:10px;border:1px solid var(--line);border-radius:4px;background:var(--bg);color:var(--ink)}
+.q{font-size:1.15rem;margin:0 0 10px}
+.q b{display:inline-block;min-width:1.6em;text-align:center;border:1px solid var(--ink);border-radius:4px;padding:0 6px}
+.bar{display:grid;grid-template-columns:2.2em 1fr 4.5em;gap:8px;align-items:center;font-size:.9rem;margin:3px 0}
+.bar i{display:block;height:14px;background:var(--line);border-radius:2px;min-width:2px}
+.bar.ok i{background:var(--acc2)}
+.bar.ok span:first-child{font-weight:700;color:var(--acc2)}
+.bar span:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.msg{margin-top:10px;padding:8px 10px;border-left:3px solid var(--acc);background:var(--bg);font-size:.92rem}
+.heat{max-height:280px;overflow:auto;border:1px solid var(--line);border-radius:4px}
+#nums{display:flex;gap:6px;flex-wrap:wrap;font-variant-numeric:tabular-nums;font-size:.9rem;margin-top:8px}
+#nums span{padding:2px 8px;border-radius:3px;border:1px solid var(--line)}
+.log{list-style:none;margin:0;padding:0}
+.log li{padding:8px 0;border-top:1px solid var(--line);white-space:pre-wrap;word-break:break-all}
+.log li:first-child{border-top:0}
+.log small{display:block;font-family:"Hiragino Sans","Yu Gothic",system-ui,sans-serif;color:var(--sub);font-size:.78rem}
+details{border-top:1px solid var(--line);padding:8px 0}
+details:first-of-type{border-top:0}
+summary{cursor:pointer;font-weight:600}
+details p{margin:6px 0 4px;font-size:.93rem}
+.ans{white-space:pre-wrap;margin-top:10px;font-size:.95rem}
+</style>
+</head>
+<body>
+<main>
+<h1>ミニ言語モデルを育てる</h1>
+<p class="lead">「直前の2文字を見て、次の1文字を当てる」だけの小さなAIです。上から順に触ると、AIがどう覚えていくかが見えます。</p>
+
+<h2>まず1問だけ、ゆっくり見てみる</h2>
+<div class="panel">
+  <p class="cap">学習文章の中から出題された問題</p>
+  <p class="q serif" id="dq"></p>
+  <p class="cap">AIの予想（確率が高い文字の順）</p>
+  <div id="bars"></div>
+  <div class="msg" id="dmsg"></div>
+  <div class="row" style="margin-top:10px">
+    <button class="primary" id="d1">この問題で1回学習</button>
+    <button id="d10">10回</button>
+    <button id="d100">100回</button>
+    <button id="dn">別の問題にする</button>
+  </div>
+  <p class="note">正解は、学習文章に実際に書いてある「次の文字」です。AIが正解の文字に高い確率をつけられていなければ「まちがい」とみなし、内部の数字を少し直します。</p>
+</div>
+
+<h2>たくさん学習させる</h2>
+<div class="panel">
+  <div class="row">
+    <button class="primary" id="go">学習スタート</button>
+    <button id="reset">最初からやり直す</button>
+    <label>速さ <input type="range" id="speed" min="100" max="3000" step="100" value="800"></label>
+  </div>
+</div>
+<div class="panel">
+  <div class="stats">
+    <div><span class="cap">学習回数</span><br><b id="st">0</b></div>
+    <div><span class="cap">まちがい度（小さいほど賢い）</span><br><b id="ls">–</b></div>
+  </div>
+  <canvas id="cv" width="700" height="170" role="img" aria-label="まちがい度の推移グラフ"></canvas>
+  <p class="note">グラフが右肩下がりになるほど、正解の文字に高い確率をつけられるようになっています。</p>
+</div>
+<div class="panel">
+  <p class="cap">いまのAIが書いた文章（0.3秒ごとに更新）</p>
+  <div class="live serif" id="live"></div>
+</div>
+
+<h2>AIの中身の数字が動くところ</h2>
+<div class="panel">
+  <p class="cap">AIが調整できる数字は全部で <b id="np"></b> 個。その一部、「文字ごとの8個の数字」です（赤はプラス、青はマイナス）。</p>
+  <div class="heat"><canvas id="heat"></canvas></div>
+  <div class="row" style="margin-top:10px"><label>この文字の数字を見る <select id="chsel"></select></label></div>
+  <div id="nums"></div>
+  <p class="note">学習の前後で色や数字が変わります。AIは文章そのものを保存しているのではなく、こうした数字の組み合わせの中に「どの文字の後にどの文字が来やすいか」を染み込ませています。</p>
+</div>
+
+<h2>成長の記録</h2>
+<div class="panel"><ul class="log serif" id="log"></ul></div>
+
+<h2>書き出しを決めて続きを書かせる</h2>
+<div class="panel">
+  <div class="row">
+    <input type="text" id="seed" placeholder="例：猫は" aria-label="書き出し" style="width:9em">
+    <button id="gen">続きを書く</button>
+    <label>ランダムさ <input type="range" id="temp" min="0.3" max="1.5" step="0.1" value="0.8"></label>
+  </div>
+  <div class="live serif" id="out" style="min-height:2.5em;margin-top:8px;font-size:1.15rem"></div>
+</div>
+
+<h2>よくある疑問</h2>
+<div class="panel">
+  <details open><summary>どうやって覚えているの？</summary><p>「覚える」とは、AIの中の数字（上の赤と青の数字など）を調整することです。最初はでたらめな数字で、まちがえるたびに「正解の文字が出やすくなる方向」へ、すべての数字をほんの少しだけ動かします。これを何千回も繰り返すと、数字の中に文章のクセが染み込みます。</p></details>
+  <details><summary>正解はどうやって判定しているの？</summary><p>学習文章そのものが答えです。「猫は」の次に来る文字は、文章を見れば分かります。AIは各文字に「次に来る確率」をつけ、正解の文字にどれだけ高い確率をつけたかで採点されます。人が1問ずつ○×をつけているわけではありません。</p></details>
+  <details><summary>「まちがい度」ってなに？</summary><p>正解の文字につけた確率から計算します。確率100％ならまちがい度0、50％なら約0.7、10％なら約2.3、1％なら約4.6です。確率が低いほど大きくなり、AIはこの数字を小さくするように数字を直します。</p></details>
+  <details><summary>なぜ最初はでたらめなの？</summary><p>数字がランダムなので、どの文字もほぼ同じ確率になっているからです。上の「1問だけ見る」で、最初は棒がほぼ同じ長さなのを確認できます。</p></details>
+  <details><summary>なぜ少しずつしか数字を動かさないの？</summary><p>1つの問題に合わせて大きく動かすと、別の問題の答えがくずれてしまうからです。たくさんの問題で少しずつ直すことで、全体にうまく合う数字に近づきます。</p></details>
+  <details><summary>学習させ続けるとどうなる？</summary><p>文章が短いので、いずれ学習文章をほぼ丸暗記します。新しい内容を考えているわけではなく、覚えた文章を組み替えているだけです。ChatGPTやClaudeは、これをはるかに大きな規模で、膨大な文章を使って行っています。</p></details>
+</div>
+
+
+<h2>学習させる文章を変える</h2>
+<div class="panel">
+  <p class="note" style="margin:0 0 8px">1行が1文です。短い文を10行以上入れるのがおすすめです。変えたら「最初からやり直す」を押してください。</p>
+  <textarea id="corpus" rows="8" aria-label="学習させる文章"></textarea>
+</div>
+<p class="note"><a href="../" style="color:var(--acc)">講義アプリの一覧へ戻る</a></p>
+</main>
+
+<script>
+var DEFAULT_TEXT=["今日はいい天気ですね。","猫はこたつで丸くなっています。","私は朝ごはんにパンを食べました。","犬は公園で楽しそうに走っています。","明日は友だちと映画を見に行きます。","夜になると空に星がきれいに見えます。","猫は魚が大好きです。","私は夜ごはんにカレーを食べました。","犬は散歩が大好きです。","明日は家族と海に行きます。","星がきれいな夜は散歩に行きます。","今日はこたつで本を読みました。"].join("\n");
+var $=function(s){return document.querySelector(s);};
+var D=8,C=2,H=48;
+var V,data,vocab,idx,E,W1,b1,W2,b2,x,h,p,lg,dl,dh,dz,dx,nparams;
+var step=0,ema=null,losses=[],running=false,logged={},frame=0,demoI=0,sampleFn=null;
+var MILESTONES=[0,300,1000,3000,10000,30000,100000];
+function rnd(n,s){var a=new Float32Array(n);for(var i=0;i<n;i++)a[i]=(Math.random()*2-1)*s;return a;}
+function show(c){return c==="\n"?"⏎":c;}
+
+function init(){
+  var t=$("#corpus").value.replace(/\r/g,"").split("\n").map(function(l){return l.trim();}).filter(Boolean).join("\n");
+  if(t.length<10){t=DEFAULT_TEXT;$("#corpus").value=t;}
+  var arr=Array.from("\n\n"+t+"\n");
+  vocab=Array.from(new Set(arr));idx=new Map();vocab.forEach(function(c,i){idx.set(c,i);});
+  V=vocab.length;data=arr.map(function(c){return idx.get(c);});
+  E=rnd(V*D,0.3);W1=rnd(C*D*H,0.3);b1=new Float32Array(H);W2=rnd(H*V,0.3);b2=new Float32Array(V);
+  x=new Float32Array(C*D);h=new Float32Array(H);p=new Float32Array(V);lg=new Float32Array(V);
+  dl=new Float32Array(V);dh=new Float32Array(H);dz=new Float32Array(H);dx=new Float32Array(C*D);
+  nparams=V*D+C*D*H+H+H*V+V;$("#np").textContent=nparams.toLocaleString("ja-JP");
+  step=0;ema=null;losses=[];logged={};frame=0;$("#log").innerHTML="";
+  $("#st").textContent="0";$("#ls").textContent="–";
+  var sel=$("#chsel");sel.innerHTML="";
+  vocab.forEach(function(c,i){if(c==="\n")return;var o=document.createElement("option");o.value=i;o.textContent=c;sel.appendChild(o);});
+  var ci=idx.has("猫")?idx.get("猫"):parseInt(sel.options[0].value,10);sel.value=ci;
+  draw();refresh();newDemo();
+  $("#live").textContent=sample("",60,0.8);addLog();
+}
+
+function forward(c0,c1,temp){
+  var i,j,k,s;
+  for(k=0;k<D;k++){x[k]=E[c0*D+k];x[D+k]=E[c1*D+k];}
+  for(j=0;j<H;j++){s=b1[j];for(i=0;i<C*D;i++)s+=x[i]*W1[i*H+j];h[j]=Math.tanh(s);}
+  var mx=-1e9;
+  for(k=0;k<V;k++){s=b2[k];for(j=0;j<H;j++)s+=h[j]*W2[j*V+k];lg[k]=s/temp;if(lg[k]>mx)mx=lg[k];}
+  var sum=0;for(k=0;k<V;k++){p[k]=Math.exp(lg[k]-mx);sum+=p[k];}
+  for(k=0;k<V;k++)p[k]/=sum;
+}
+function trainStep(lr,at){
+  var N=data.length,i=(at===undefined)?C+Math.floor(Math.random()*(N-C)):at;
+  var c0=data[i-2],c1=data[i-1],y=data[i];
+  forward(c0,c1,1);
+  var loss=-Math.log(p[y]+1e-9),j,k,a;
+  for(k=0;k<V;k++)dl[k]=p[k];dl[y]-=1;
+  for(j=0;j<H;j++){var s=0;for(k=0;k<V;k++)s+=W2[j*V+k]*dl[k];dz[j]=s*(1-h[j]*h[j]);}
+  for(j=0;j<H;j++){var hj=h[j]*lr;for(k=0;k<V;k++)W2[j*V+k]-=hj*dl[k];}
+  for(k=0;k<V;k++)b2[k]-=lr*dl[k];
+  for(a=0;a<C*D;a++){var s2=0;for(j=0;j<H;j++)s2+=W1[a*H+j]*dz[j];dx[a]=s2;}
+  for(a=0;a<C*D;a++){var xa=x[a]*lr;for(j=0;j<H;j++)W1[a*H+j]-=xa*dz[j];}
+  for(j=0;j<H;j++)b1[j]-=lr*dz[j];
+  for(k=0;k<D;k++){E[c0*D+k]-=lr*dx[k];E[c1*D+k]-=lr*dx[D+k];}
+  return loss;
+}
+function sample(seed,len,temp){
+  var chars=Array.from(seed||"").filter(function(c){return idx.has(c);});
+  var out=chars.slice(),ctx=["\n","\n"].concat(chars).slice(-2);
+  for(var n=0;n<len;n++){
+    forward(idx.get(ctx[0]),idx.get(ctx[1]),temp);
+    var r=Math.random(),acc=0,k;
+    for(k=0;k<V;k++){acc+=p[k];if(r<=acc)break;}
+    if(k>=V)k=V-1;
+    var ch=vocab[k];
+    if(ch==="\n"&&out.length>=len/3)break;
+    out.push(ch);ctx=[ctx[1],ch];
+  }
+  return out.join("").replace(/\n+/g," / ").trim();
+}
+
+/* 1問ずつ見る */
+function newDemo(msg){demoI=C+Math.floor(Math.random()*(data.length-C));renderDemo(msg||"");}
+function renderDemo(msg){
+  var c0=data[demoI-2],c1=data[demoI-1],y=data[demoI];
+  forward(c0,c1,1);
+  var order=[],k;for(k=0;k<V;k++)order.push(k);
+  order.sort(function(a,b){return p[b]-p[a];});
+  var top=order.slice(0,6);if(top.indexOf(y)<0)top[5]=y;
+  var html="";
+  top.forEach(function(c){
+    html+='<div class="bar'+(c===y?' ok':'')+'"><span class="serif">'+show(vocab[c])+'</span><i style="width:'+Math.max(p[c]*100,0.5)+'%"></i><span>'+(p[c]*100).toFixed(1)+'%</span></div>';
+  });
+  $("#bars").innerHTML=html;
+  $("#dq").innerHTML='文章の中で <b>'+show(vocab[c0])+'</b><b>'+show(vocab[c1])+'</b> の次に来ていた文字は？ 正解は <b>'+show(vocab[y])+'</b>（⏎は文の区切り）';
+  var l=-Math.log(p[y]+1e-9);
+  $("#dmsg").textContent=(msg?msg+"　":"")+"いまAIは「"+show(vocab[y])+"」に "+(p[y]*100).toFixed(1)+"% の確率をつけています。この問題のまちがい度は "+l.toFixed(2)+" です。";
+}
+function demoTrain(n){
+  var c=data[demoI],before;forward(data[demoI-2],data[demoI-1],1);before=p[c];
+  for(var i=0;i<n;i++)trainStep(0.1,demoI);
+  step+=n;$("#st").textContent=step.toLocaleString("ja-JP");
+  forward(data[demoI-2],data[demoI-1],1);
+  renderDemo(n+"回学習：正解の確率 "+(before*100).toFixed(1)+"% → "+(p[c]*100).toFixed(1)+"%。");
+  refresh();
+}
+
+/* 見える化 */
+function cssv(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+function draw(){
+  var cv=$("#cv"),g=cv.getContext("2d"),w=cv.width,ht=cv.height;g.clearRect(0,0,w,ht);
+  g.strokeStyle=cssv("--line");g.lineWidth=1;
+  var top=Math.log(V)+0.2,i;
+  g.fillStyle=cssv("--sub");g.font="12px sans-serif";
+  for(i=0;i<=4;i++){var y=10+(ht-30)*i/4;g.beginPath();g.moveTo(40,y);g.lineTo(w-8,y);g.stroke();g.fillText((top*(1-i/4)).toFixed(1),4,y+4);}
+  g.fillText("学習回数 →",w-80,ht-4);
+  if(losses.length<2)return;
+  g.strokeStyle=cssv("--acc");g.lineWidth=2.5;g.beginPath();
+  for(var k=0;k<losses.length;k++){
+    var px=40+(w-48)*k/Math.max(losses.length-1,1),py=10+(ht-30)*(1-Math.min(losses[k],top)/top);
+    if(k===0)g.moveTo(px,py);else g.lineTo(px,py);
+  }
+  g.stroke();
+}
+function drawHeat(){
+  var cv=$("#heat"),rh=18,lw=34,cw=34,r=1,w=lw+D*cw,ht=V*rh;
+  cv.width=w*r;cv.height=ht*r;cv.style.width=w+"px";cv.style.height=ht+"px";
+  var g=cv.getContext("2d");g.font="13px sans-serif";g.textBaseline="middle";
+  var pos=cssv("--acc2"),neg=cssv("--acc"),ink=cssv("--ink");
+  for(var c=0;c<V;c++){
+    g.fillStyle=ink;g.fillText(show(vocab[c]),8,c*rh+rh/2);
+    for(var k=0;k<D;k++){
+      var v=E[c*D+k],a=Math.min(Math.abs(v)/1.5,1);
+      g.globalAlpha=0.12+0.88*a;g.fillStyle=v>=0?pos:neg;
+      g.fillRect(lw+k*cw+1,c*rh+1,cw-2,rh-2);
+    }
+    g.globalAlpha=1;
+  }
+}
+function drawNums(){
+  var c=parseInt($("#chsel").value,10),el=$("#nums");el.innerHTML="";
+  for(var k=0;k<D;k++){
+    var v=E[c*D+k],s=document.createElement("span");
+    s.textContent=(v>=0?"+":"")+v.toFixed(2);
+    s.style.color=v>=0?cssv("--acc2"):cssv("--acc");el.appendChild(s);
+  }
+}
+function refresh(){drawHeat();drawNums();}
+function addLog(){
+  MILESTONES.forEach(function(m){
+    if(step>=m&&!logged[m]){
+      logged[m]=true;
+      var li=document.createElement("li"),sm=document.createElement("small");
+      sm.textContent="学習 "+m.toLocaleString("ja-JP")+" 回"+(ema!==null?"　まちがい度 "+ema.toFixed(2):"");
+      li.appendChild(sm);li.appendChild(document.createTextNode(sample("",60,0.8)));
+      $("#log").appendChild(li);
+    }
+  });
+}
+function loop(){
+  if(!running)return;
+  var n=parseInt($("#speed").value,10);
+  for(var i=0;i<n;i++){var l=trainStep(0.1);ema=ema===null?l:ema*0.995+l*0.005;step++;if(step%100===0)losses.push(ema);}
+  $("#st").textContent=step.toLocaleString("ja-JP");$("#ls").textContent=ema.toFixed(2);
+  frame++;
+  if(frame%2===0)refresh();
+  if(frame%6===0){draw();$("#live").textContent=sample("",60,0.8);addLog();renderDemo("");}
+  requestAnimationFrame(loop);
+}
+
+$("#go").addEventListener("click",function(){running=!running;this.textContent=running?"一時停止":"学習スタート";if(running)requestAnimationFrame(loop);});
+$("#reset").addEventListener("click",function(){running=false;$("#go").textContent="学習スタート";init();});
+$("#gen").addEventListener("click",function(){$("#out").textContent=sample($("#seed").value,70,parseFloat($("#temp").value));});
+$("#d1").addEventListener("click",function(){demoTrain(1);});
+$("#d10").addEventListener("click",function(){demoTrain(10);});
+$("#d100").addEventListener("click",function(){demoTrain(100);});
+$("#dn").addEventListener("click",function(){newDemo();});
+$("#chsel").addEventListener("change",drawNums);
+
+$("#corpus").value=DEFAULT_TEXT;
+init();
+</script>
+</body>
+</html>
