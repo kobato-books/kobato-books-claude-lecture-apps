@@ -3,37 +3,292 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>チャピのAI講義室｜講義アプリ</title>
-<meta name="description" content="講義の内容を、実際に動かして確かめられるアプリです。ボタンを押すだけで、AIの学習の様子を見られます。">
+<title>AIが、文章らしくなるまで｜チャピのAI講義室 第21回</title>
 <!-- OGP（SNSで共有したときの表示） -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="チャピのAI講義室｜KOBATO BOOKS">
 <meta property="og:locale" content="ja_JP">
-<meta property="og:title" content="チャピのAI講義室｜講義アプリ">
-<meta property="og:description" content="講義の内容を、実際に動かして確かめられるアプリです。ボタンを押すだけで、AIの学習の様子を見られます。">
-<meta property="og:url" content="https://lecture.kobatobooks.jp/">
-<meta property="og:image" content="https://lecture.kobatobooks.jp/ogp.png">
-<meta property="og:image:alt" content="チャピのAI講義室｜講義アプリ">
+<meta property="og:title" content="AIが、文章らしくなるまで｜チャピのAI講義室 第21回">
+<meta property="og:description" content="ボタンを押して、見ているだけ。でたらめな文字を書いていたAIが、20秒ほどで文章らしくなっていきます。">
+<meta property="og:url" content="https://lecture.kobatobooks.jp/lecture21/">
+<meta property="og:image" content="https://lecture.kobatobooks.jp/lecture21/ogp.png">
+<meta property="og:image:alt" content="チャピのAI講義室 第21回「AIが、文章らしくなるまで」">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="description" content="ボタンを押して見ているだけ。でたらめな文字を書いていたAIが、学習で文章らしくなっていく様子を見られます。">
 <style>
-:root{--bg:#eef2f6;--ink:#1b2a41;--sub:#5b6b80;--card:#fbfcfe;--line:#c7d2df;--acc:#0f7b8a}
-@media (prefers-color-scheme:dark){:root{--bg:#121a26;--ink:#e6edf6;--sub:#93a3b8;--card:#18212e;--line:#2c394b;--acc:#4cc3d3}}
+:root{
+  --sky:#e6f0f6;--card:#ffffff;--ink:#16324b;--sub:#4f6678;--line:#b9cbd8;
+  --grass:#9bd64f;--mark:#9bd64f;--grass-soft:#e3f3cb;--ring:rgba(155,214,79,.75);--on-grass:#16324b;--coral:#c8372d;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)
+}
+@media (prefers-color-scheme:dark){
+  :root{--sky:#0f1c2a;--card:#16293b;--ink:#eaf2f8;--sub:#9db2c4;--line:#2e4660;--grass:#a8de5c;--mark:#3f6b2b;--grass-soft:#2a4222;--ring:rgba(168,222,92,.6);--on-grass:#10243a;--coral:#ff7a6e}
+}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:"Hiragino Sans","Yu Gothic","Noto Sans JP",system-ui,sans-serif;line-height:1.75;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
-main{max-width:640px;margin:0 auto;padding:32px 16px 56px}
-h1{font-size:1.5rem;margin:0 0 4px}
-p{color:var(--sub);margin:0 0 20px}
-a.item{display:block;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:14px 16px;margin-bottom:10px;color:var(--ink);text-decoration:none}
-a.item:hover,a.item:focus-visible{border-color:var(--acc);outline:none}
-a.item b{display:block}
-a.item span{color:var(--sub);font-size:.9rem}
+[hidden]{display:none!important}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--sky);color:var(--ink);
+  font-family:"Hiragino Maru Gothic ProN","Hiragino Sans","BIZ UDPGothic","Yu Gothic","Noto Sans JP",system-ui,sans-serif;line-height:1.6;-webkit-text-size-adjust:100%}
+main{max-width:520px;margin:0 auto;padding:20px 16px 48px}
+.serif{font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif}
+.tag{font-size:.82rem;color:var(--sub);margin:0 0 6px;font-weight:700}
+h1{margin:0;font-size:clamp(1.7rem,7vw,2.25rem);line-height:1.3;font-weight:800;letter-spacing:.02em;
+  background:linear-gradient(transparent 62%,var(--mark) 62%,var(--mark) 92%,transparent 92%);display:inline}
+#sub{margin:12px 0 16px;font-size:1.05rem;font-weight:700}
+
+/* 成長バー＋AIの文章 */
+.stage{background:var(--card);border:2px solid var(--ink);border-radius:18px;padding:12px 12px 16px}
+.grow{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.cell{text-align:center;padding:6px 2px 4px;border-radius:12px;border:2px solid transparent;opacity:.38;filter:grayscale(1);transition:opacity .25s,filter .25s,background-color .25s}
+.cell.past{opacity:.9;filter:none}
+.cell.on{opacity:1;filter:none;background:var(--grass-soft);border-color:var(--ink)}
+.cell .e{display:block;font-size:1.7rem;line-height:1.25}
+.cell .l{display:block;font-size:.72rem;font-weight:800}
+.cell.pop{animation:pop .45s ease-out}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.18)}100%{transform:scale(1)}}
+.track{height:8px;border-radius:99px;background:var(--line);margin:8px 2px 12px;overflow:hidden}
+.track i{display:block;height:100%;width:0;background:var(--grass);border-right:2px solid var(--ink);border-radius:99px}
+.cap{font-size:.8rem;color:var(--sub);margin:0 0 4px;font-weight:700}
+#live{font-size:clamp(1.3rem,5.6vw,1.6rem);line-height:1.8;min-height:7.3em;margin:0;word-break:break-all;white-space:pre-wrap}
+
+/* ボタン */
+.btnwrap{position:relative;margin:36px 0 18px}
+#main{width:100%;min-height:64px;font:inherit;font-size:1.35rem;font-weight:800;color:var(--on-grass);background:var(--grass);
+  border:3px solid var(--ink);border-radius:18px;box-shadow:0 5px 0 var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px}
+#main:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}
+#main:focus-visible,#gen:focus-visible,a:focus-visible{outline:3px solid var(--coral);outline-offset:3px}
+#main.idle{animation:ring 1.8s ease-out infinite}
+@keyframes ring{0%{box-shadow:0 5px 0 var(--ink),0 0 0 0 var(--ring)}70%{box-shadow:0 5px 0 var(--ink),0 0 0 16px transparent}100%{box-shadow:0 5px 0 var(--ink),0 0 0 0 transparent}}
+.hint{position:absolute;right:16px;top:-30px;font-size:1.9rem;animation:nudge 1s ease-in-out infinite;pointer-events:none}
+@keyframes nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+#gen{width:100%;margin-top:12px;min-height:48px;font:inherit;font-weight:700;color:var(--ink);background:transparent;border:2px solid var(--ink);border-radius:14px;cursor:pointer}
+
+/* 数字 */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{border-left:4px solid var(--grass);padding:2px 0 2px 10px}
+.stat b{font-size:1.9rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.2}
+.stat b small{font-size:1rem;margin-left:2px}
+.stat>span{display:block;font-size:.78rem;color:var(--sub);font-weight:700}
+
+/* 比較 */
+#cmp{margin-top:16px}
+.cmpgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cmpc{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:10px 12px}
+.cmpc.now{border-color:var(--ink)}
+.cmpc .cap{margin-bottom:6px}
+.cmpc p.serif{margin:0;font-size:1.05rem;line-height:1.75;word-break:break-all;white-space:pre-wrap}
+.honest{font-size:.85rem;color:var(--sub);margin:10px 0 0}
+@media (max-width:360px){.cmpgrid{grid-template-columns:1fr}}
+
+/* しくみ */
+.loop{list-style:none;margin:26px 0 6px;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.loop li{text-align:center;position:relative;padding:8px 2px;border-radius:12px;border:2px solid transparent}
+.loop li+li::before{content:"›";position:absolute;left:-7px;top:12px;font-size:1.3rem;font-weight:800;color:var(--sub)}
+.loop .e{display:block;font-size:1.6rem;line-height:1.2}
+.loop .l{display:block;font-size:.72rem;font-weight:800}
+.loop li.hi{background:var(--grass-soft);border-color:var(--ink)}
+.loopcap{text-align:center;font-size:.82rem;color:var(--sub);margin:0 0 22px;font-weight:700}
+.links{display:flex;flex-direction:column;gap:6px;font-size:.9rem}
+.links a{color:var(--ink);font-weight:700}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (prefers-reduced-motion:reduce){
+  #main.idle,.hint,.cell.pop{animation:none}
+  .cell{transition:none}
+}
+.copy{text-align:center;font-size:.8rem;color:var(--sub);margin:32px 0 0}
 </style>
 </head>
 <body>
 <main>
-<h1>チャピのAI講義室｜講義アプリ</h1>
-<p>講義の内容を、実際に動かして確かめられるアプリです。</p>
-<a class="item" href="lecture21/"><b>第21回　AIが、文章らしくなるまで</b><span>ボタンを押して、見ているだけ。でたらめな文字が、文章らしくなっていきます。</span></a>
+<p class="tag">チャピのAI講義室｜第21回</p>
+<h1>AIが、文章らしくなるまで</h1>
+<p id="sub" aria-live="polite">ボタンを押して、見ているだけ。</p>
+
+<section class="stage" aria-label="AIの成長">
+  <div class="grow" id="grow"></div>
+  <div class="track" aria-hidden="true"><i id="fill"></i></div>
+  <p class="cap">AIが書いた文章</p>
+  <p class="serif" id="live">…</p>
+</section>
+
+<div class="btnwrap">
+  <span class="hint" id="hint" aria-hidden="true">👆</span>
+  <button type="button" id="main" class="idle"><span id="bi" aria-hidden="true">▶</span><span id="bt">育てる</span></button>
+  <button type="button" id="gen" hidden>🎲 別の文章を書かせる</button>
+</div>
+
+<div class="stats">
+  <div class="stat"><b><span id="st">0</span><small>回</small></b><span>学習した回数</span></div>
+  <div class="stat"><b><span id="hit">0</span><small>%</small></b><span>次の文字を当てた割合</span></div>
+</div>
+
+<section id="cmp" hidden>
+  <div class="cmpgrid">
+    <div class="cmpc"><p class="cap">🥚 さいしょ</p><p class="serif" id="cmpA"></p></div>
+    <div class="cmpc now"><p class="cap">🐦 いま</p><p class="serif" id="cmpB"></p></div>
+  </div>
+  <p class="honest">学習に使った文章を覚えて、組み合わせて書いています。</p>
+</section>
+
+<ol class="loop" id="loop">
+  <li><span class="e" aria-hidden="true">👀</span><span class="l">2文字を見る</span></li>
+  <li><span class="e" aria-hidden="true">🤔</span><span class="l">次を当てる</span></li>
+  <li><span class="e" aria-hidden="true">✅</span><span class="l">答え合わせ</span></li>
+  <li><span class="e" aria-hidden="true">🔧</span><span class="l">数字を直す</span></li>
+</ol>
+<p class="loopcap">AIの中では、これを何千回もくり返しています</p>
+
+<div class="links">
+  <a href="detail/">くわしく見る（中の数字・グラフ）</a>
+  <a href="../">講義アプリの一覧へ</a>
+</div>
+<p class="sr" id="stagelive" aria-live="polite"></p>
+<noscript><p>このアプリを動かすには、JavaScriptをオンにしてください。</p></noscript>
+<p class="copy">© 2026 KOBATO BOOKS</p>
 </main>
+
+<script>
+/* ===== ミニ言語モデル（詳しい版と同じ学習のしくみ） ===== */
+var TEXT=["今日はいい天気ですね。","猫はこたつで丸くなっています。","私は朝ごはんにパンを食べました。","犬は公園で楽しそうに走っています。","明日は友だちと映画を見に行きます。","夜になると空に星がきれいに見えます。","猫は魚が大好きです。","私は夜ごはんにカレーを食べました。","犬は散歩が大好きです。","明日は家族と海に行きます。","星がきれいな夜は散歩に行きます。","今日はこたつで本を読みました。"].join("\n");
+var D=8,C=2,H=48,LR=0.1;
+var V,data,vocab,idx,nl,E,W1,b1,W2,b2,x,h,p,lg,dl,dz,dx;
+function rnd(n,s){var a=new Float32Array(n);for(var i=0;i<n;i++)a[i]=(Math.random()*2-1)*s;return a;}
+function initModel(){
+  var arr=Array.from("\n\n"+TEXT+"\n");
+  vocab=Array.from(new Set(arr));idx=new Map();vocab.forEach(function(c,i){idx.set(c,i);});
+  V=vocab.length;data=arr.map(function(c){return idx.get(c);});nl=idx.get("\n");
+  E=rnd(V*D,0.3);W1=rnd(C*D*H,0.3);b1=new Float32Array(H);W2=rnd(H*V,0.3);b2=new Float32Array(V);
+  x=new Float32Array(C*D);h=new Float32Array(H);p=new Float32Array(V);lg=new Float32Array(V);
+  dl=new Float32Array(V);dz=new Float32Array(H);dx=new Float32Array(C*D);
+}
+function forward(c0,c1,temp){
+  var i,j,k,s;
+  for(k=0;k<D;k++){x[k]=E[c0*D+k];x[D+k]=E[c1*D+k];}
+  for(j=0;j<H;j++){s=b1[j];for(i=0;i<C*D;i++)s+=x[i]*W1[i*H+j];h[j]=Math.tanh(s);}
+  var mx=-1e9;
+  for(k=0;k<V;k++){s=b2[k];for(j=0;j<H;j++)s+=h[j]*W2[j*V+k];lg[k]=s/temp;if(lg[k]>mx)mx=lg[k];}
+  var sum=0;for(k=0;k<V;k++){p[k]=Math.exp(lg[k]-mx);sum+=p[k];}
+  for(k=0;k<V;k++)p[k]/=sum;
+}
+function trainStep(){
+  var N=data.length,i=C+Math.floor(Math.random()*(N-C));
+  var c0=data[i-2],c1=data[i-1],y=data[i],j,k,a;
+  forward(c0,c1,1);
+  for(k=0;k<V;k++)dl[k]=p[k];dl[y]-=1;
+  for(j=0;j<H;j++){var s=0;for(k=0;k<V;k++)s+=W2[j*V+k]*dl[k];dz[j]=s*(1-h[j]*h[j]);}
+  for(j=0;j<H;j++){var hj=h[j]*LR;for(k=0;k<V;k++)W2[j*V+k]-=hj*dl[k];}
+  for(k=0;k<V;k++)b2[k]-=LR*dl[k];
+  for(a=0;a<C*D;a++){var s2=0;for(j=0;j<H;j++)s2+=W1[a*H+j]*dz[j];dx[a]=s2;}
+  for(a=0;a<C*D;a++){var xa=x[a]*LR;for(j=0;j<H;j++)W1[a*H+j]-=xa*dz[j];}
+  for(j=0;j<H;j++)b1[j]-=LR*dz[j];
+  for(k=0;k<D;k++){E[c0*D+k]-=LR*dx[k];E[c1*D+k]-=LR*dx[D+k];}
+}
+function sampleText(temp){
+  var out=[],ctx=[nl,nl],lines=0;
+  for(var n=0;n<46;n++){
+    forward(ctx[0],ctx[1],temp);
+    var r=Math.random(),acc=0,k;
+    for(k=0;k<V;k++){acc+=p[k];if(r<=acc)break;}
+    if(k>=V)k=V-1;
+    if(k===nl){
+      if(out.length===0||out[out.length-1]==="\n"){ctx=[ctx[1],k];continue;}
+      out.push("\n");lines++;if(lines>=2)break;
+    }else out.push(vocab[k]);
+    ctx=[ctx[1],k];
+  }
+  return out.join("").trim();
+}
+function hitRate(){
+  var ok=0,n=0;
+  for(var i=C;i<data.length;i++){
+    forward(data[i-2],data[i-1],1);
+    var b=0;for(var k=1;k<V;k++)if(p[k]>p[b])b=k;
+    if(b===data[i])ok++;n++;
+  }
+  return Math.round(ok/n*100);
+}
+
+/* ===== 画面 ===== */
+var $=function(s){return document.querySelector(s);};
+var STAGES=[{at:0,e:"🥚",l:"でたらめ"},{at:150,e:"🐣",l:"もじ"},{at:700,e:"🐥",l:"ことば"},{at:1800,e:"🐦",l:"ぶんしょう"}];
+var MAX=3000;
+var RM=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+var state="idle",step=0,vt=0,last=0,lastText=0,stageNow=-1,firstText="",hi=0,hiTimer=null;
+var growEl=$("#grow");
+STAGES.forEach(function(s){
+  var d=document.createElement("div");d.className="cell";
+  d.innerHTML='<span class="e" aria-hidden="true">'+s.e+'</span><span class="l">'+s.l+'</span>';
+  growEl.appendChild(d);
+});
+var cells=growEl.children,loopLis=document.querySelectorAll("#loop li");
+
+function stageOf(n){var s=0;for(var i=0;i<STAGES.length;i++)if(n>=STAGES[i].at)s=i;return s;}
+function paintStage(announce){
+  var s=stageOf(step);
+  for(var i=0;i<cells.length;i++){cells[i].className="cell"+(i<s?" past":"")+(i===s?" on":"");}
+  if(s!==stageNow){
+    if(stageNow!==-1&&!RM){cells[s].classList.add("pop");}
+    if(announce&&stageNow!==-1)$("#stagelive").textContent="いまは「"+STAGES[s].l+"」の段階です";
+    stageNow=s;
+  }
+  $("#fill").style.width=Math.min(step/1800,1)*100+"%";
+}
+function paintNums(){$("#st").textContent=step.toLocaleString("ja-JP");}
+function paintText(){$("#live").textContent=sampleText(0.8);$("#hit").textContent=hitRate();}
+function setButton(icon,label,cls){$("#bi").textContent=icon;$("#bt").textContent=label;$("#main").className=cls||"";}
+function startHi(){
+  stopHi();
+  if(RM)return;
+  hiTimer=setInterval(function(){loopLis.forEach(function(li,i){li.classList.toggle("hi",i===hi);});hi=(hi+1)%loopLis.length;},450);
+}
+function stopHi(){if(hiTimer){clearInterval(hiTimer);hiTimer=null;}loopLis.forEach(function(li){li.classList.remove("hi");});}
+
+function resetAll(){
+  initModel();step=0;vt=0;stageNow=-1;state="idle";
+  paintStage(false);paintNums();
+  firstText=sampleText(0.8);$("#live").textContent=firstText;$("#hit").textContent=hitRate();
+  $("#cmp").hidden=true;$("#gen").hidden=true;
+  $("#sub").textContent="ボタンを押して、見ているだけ。";
+  setButton("▶","育てる","idle");
+}
+function begin(){
+  state="running";$("#hint").hidden=true;
+  setButton("⏸","止める","");
+  last=performance.now();startHi();requestAnimationFrame(tick);
+}
+function pause(){state="paused";setButton("▶","つづける","");stopHi();}
+function finish(){
+  state="done";stopHi();
+  paintStage(true);paintNums();paintText();
+  $("#sub").textContent="できた！ 🎉 でたらめだった文字が、文章らしくなりました。";
+  $("#cmpA").textContent=firstText;$("#cmpB").textContent=$("#live").textContent;
+  $("#cmp").hidden=false;$("#gen").hidden=false;
+  setButton("🔄","もう一度","");
+}
+function tick(now){
+  if(state!=="running")return;
+  var dt=Math.min((now-last)/1000,0.1);last=now;vt+=dt;
+  /* 見てわかる速さにそろえる：最初はゆっくり、だんだん速く（約16秒で3,000回） */
+  var target=Math.min(MAX,Math.floor(500*(Math.exp(0.12*vt)-1)));
+  var t0=performance.now();
+  while(step<target&&performance.now()-t0<10){trainStep();step++;}
+  paintNums();
+  var before=stageNow;paintStage(true);
+  if(now-lastText>300||stageNow!==before){lastText=now;paintText();}
+  if(step>=MAX){finish();return;}
+  requestAnimationFrame(tick);
+}
+
+$("#main").addEventListener("click",function(){
+  if(state==="idle")begin();
+  else if(state==="running")pause();
+  else if(state==="paused"){state="running";setButton("⏸","止める","");last=performance.now();startHi();requestAnimationFrame(tick);}
+  else if(state==="done"){resetAll();begin();}
+});
+$("#gen").addEventListener("click",function(){
+  var t=sampleText(0.8);$("#live").textContent=t;$("#cmpB").textContent=t;
+});
+resetAll();
+</script>
 </body>
 </html>
