@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>くわしく見る｜AIが、言葉を番号にするまで｜チャピのAI講義室 第22回</title>
+<meta name="description" content="AIの辞書ができる順番を、1つずつ見られます。まとめた回数と、かたまりの数・辞書の大きさの関係をグラフで確かめられます。">
+<!-- OGP（SNSで共有したときの表示） -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="チャピのAI講義室｜KOBATO BOOKS">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:title" content="くわしく見る｜AIが、言葉を番号にするまで｜チャピのAI講義室 第22回">
+<meta property="og:description" content="AIの辞書ができる順番を1つずつ。まとめるほど、かたまりは減り、辞書は大きくなります。">
+<meta property="og:url" content="https://lecture.kobatobooks.jp/lecture22/detail/">
+<meta property="og:image" content="https://lecture.kobatobooks.jp/lecture22/detail/ogp.png">
+<meta property="og:image:alt" content="チャピのAI講義室 第22回「AIが、言葉を番号にするまで」くわしく見る版">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+:root{--bg:#eef2f6;--ink:#1b2a41;--sub:#5b6b80;--card:#fbfcfe;--line:#c7d2df;--acc:#0f7b8a;--acc-soft:#d9eef1;--on-acc:#ffffff;--warn:#a5552a;--two:#a5552a;--grid:#dde4ec}
+@media (prefers-color-scheme:dark){:root{--bg:#121a26;--ink:#e6edf6;--sub:#93a3b8;--card:#18212e;--line:#2c394b;--acc:#4cc3d3;--acc-soft:#1d3a42;--on-acc:#0d1b24;--warn:#e39a6f;--two:#e39a6f;--grid:#253244}}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Hiragino Sans","BIZ UDPGothic","Yu Gothic","Noto Sans JP",system-ui,sans-serif;line-height:1.7;-webkit-text-size-adjust:100%;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+main{max-width:640px;margin:0 auto;padding:24px 16px 56px}
+.tag{font-size:.82rem;color:var(--sub);margin:0 0 4px;font-weight:700}
+h1{font-size:clamp(1.35rem,5.6vw,1.8rem);line-height:1.35;margin:0 0 6px}
+h2{font-size:1.05rem;margin:0 0 8px}
+.lead{color:var(--sub);margin:0 0 18px}
+.cap{display:block;font-size:.8rem;color:var(--sub);font-weight:700;margin:0 0 6px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px 14px 16px;margin-bottom:14px}
+input[type=text],textarea{width:100%;font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink)}
+textarea{min-height:9.5em;font-size:.95rem;line-height:1.6}
+input[type=text]{font-size:1.1rem}
+input:focus-visible,textarea:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+#play{display:block;width:100%;margin:4px 0 12px;min-height:56px;font:inherit;font-size:1.15rem;font-weight:800;color:var(--on-acc);background:var(--acc);border:0;border-radius:8px;cursor:pointer}
+.sub-btn{font:inherit;font-size:.9rem;font-weight:700;color:var(--acc);background:transparent;border:1px solid var(--acc);border-radius:6px;padding:8px 14px;cursor:pointer;margin-top:8px}
+button:focus-visible,a:focus-visible,summary:focus-visible,input[type=range]:focus-visible{outline:3px solid var(--warn);outline-offset:3px}
+.slide{display:flex;align-items:center;gap:10px}
+input[type=range]{flex:1;accent-color:var(--acc);height:32px}
+.slide b{min-width:4.2em;text-align:right;font-variant-numeric:tabular-nums}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 0}
+.stat{border-left:3px solid var(--acc);padding:0 0 0 8px}
+.stat.two{border-color:var(--two)}
+.stat b{font-size:1.5rem;font-variant-numeric:tabular-nums;line-height:1.2;display:block}
+.stat span{font-size:.75rem;color:var(--sub);font-weight:700}
+.lastm{font-size:.92rem;margin:10px 0 0;min-height:1.5em}
+.row{display:flex;flex-wrap:wrap;gap:5px;min-height:60px;align-items:flex-start}
+.tok{display:inline-flex;flex-direction:column;align-items:center;border:1px solid var(--ink);border-radius:5px;background:var(--bg);min-width:2.2em;overflow:hidden}
+.tok .t{font-size:1.1rem;padding:3px 7px 1px;white-space:pre}
+.tok .n{font-size:.74rem;font-variant-numeric:tabular-nums;color:var(--sub);border-top:1px solid var(--line);width:100%;text-align:center;padding:1px 4px;background:var(--card)}
+.tok.unk{border-style:dashed;border-color:var(--warn)}
+.tok.unk .n{color:var(--warn)}
+.ids{margin:8px 0 0;font-family:ui-monospace,"SFMono-Regular",Menlo,monospace;font-size:.9rem;word-break:break-all}
+svg text{fill:var(--sub);font-family:inherit;font-size:11px}
+.legend{display:flex;gap:16px;font-size:.8rem;color:var(--sub);margin:4px 0 0;flex-wrap:wrap}
+.legend i{display:inline-block;width:18px;height:3px;vertical-align:middle;margin-right:5px}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th,td{border-bottom:1px solid var(--line);padding:5px 4px;text-align:left}
+th{color:var(--sub);font-size:.78rem}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+tr.done td{color:var(--ink)}
+tr.todo td{color:var(--sub);opacity:.55}
+tr.cur td{background:var(--acc-soft)}
+.scroll{max-height:320px;overflow:auto}
+details{border-top:1px solid var(--line);padding:10px 0}
+details:last-of-type{border-bottom:1px solid var(--line)}
+summary{cursor:pointer;font-weight:700}
+details p,details li{color:var(--sub);font-size:.92rem}
+.note{font-size:.85rem;color:var(--sub);margin:6px 0 0}
+.links{display:flex;flex-direction:column;gap:6px;margin-top:22px}
+.links a{color:var(--acc);font-weight:700}
+.copy{text-align:center;font-size:.8rem;color:var(--sub);margin:32px 0 0}
+</style>
+</head>
+<body>
+<main>
+<p class="tag">チャピのAI講義室｜第22回｜くわしく見る版</p>
+<h1>AIの辞書ができる順番</h1>
+<p class="lead">よく隣どうしに並ぶ2つを、1回に1組ずつまとめていきます。</p>
+
+<button type="button" id="play">最初から、まとめていく</button>
+
+<section class="panel" aria-label="まとめた回数">
+  <span class="cap">まとめた回数（動かして、途中を見られます）</span>
+  <div class="slide"><input type="range" id="k" min="0" max="21" value="0" aria-label="まとめた回数"><b id="kv">0回</b></div>
+  <div class="stats">
+    <div class="stat"><b id="sTok">–</b><span>学習文のかたまり（合計）</span></div>
+    <div class="stat two"><b id="sVoc">–</b><span>辞書の大きさ</span></div>
+    <div class="stat"><b id="sAvg">–</b><span>1文あたりのかたまり</span></div>
+  </div>
+  <p class="lastm" id="lastm"></p>
+</section>
+
+<section class="panel" aria-label="グラフ">
+  <h2>まとめるほど、かたまりは減って、辞書は大きくなる</h2>
+  <svg id="chart" viewBox="0 0 340 190" width="100%" role="img" aria-label="まとめた回数ごとの、かたまりの合計と辞書の大きさ"></svg>
+  <div class="legend"><span><i style="background:var(--acc)"></i>学習文のかたまり（合計）</span><span><i style="background:var(--two)"></i>辞書の大きさ</span></div>
+  <p class="note">点線は、いま見ている回数です。</p>
+</section>
+
+<section class="panel" aria-label="自分の文章で試す">
+  <h2>自分の文章を区切ってみる</h2>
+  <input type="text" id="txt" value="弟は公園で寝ています。" maxlength="60" autocomplete="off" aria-label="区切る文章">
+  <div class="row" id="row" style="margin-top:10px"></div>
+  <p class="ids" id="ids"></p>
+  <p class="note">上の「まとめた回数」を動かすと、区切り方が変わります。点線は辞書にない文字（0番）です。</p>
+</section>
+
+<section class="panel" aria-label="まとめた順番">
+  <h2>まとめた順番</h2>
+  <div class="scroll"><table>
+    <thead><tr><th>回</th><th>まとめた2つ</th><th>できたかたまり</th><th class="num">出た回数</th><th class="num">番号</th></tr></thead>
+    <tbody id="mtab"></tbody>
+  </table></div>
+</section>
+
+<details>
+<summary>学習に使う文章を変える</summary>
+<p>1行に1文で書きます。ボタンを押すと、辞書を作り直します。</p>
+<textarea id="corpus" aria-label="学習に使う文章"></textarea>
+<button type="button" class="sub-btn" id="retrain">この文章で、辞書を作り直す</button>
+<button type="button" class="sub-btn" id="reset">最初の文章に戻す</button>
+</details>
+<details>
+<summary>しくみ（BPE）</summary>
+<p>この方法は、BPE（バイト・ペア・エンコーディング）と呼ばれるやり方を、小さくしたものです。</p>
+<ol>
+<li>学習文を1文字ずつに分け、出てきた文字に順番に番号を付ける（これが最初の辞書）。</li>
+<li>隣どうしの2つの組を全部数える。</li>
+<li>いちばん多い組を1つのかたまりにして、辞書の最後に足す。</li>
+<li>2回以上出る組がなくなるまで、2〜3をくり返す。</li>
+</ol>
+<p>同じ回数の組が複数あるときは、学習文で先に出てきた組を選んでいます。新しい文章を区切るときは、学習で決まった順番どおりにまとめていきます。</p>
+</details>
+<details>
+<summary>人の区切り方と違うところ</summary>
+<p>「犬は本が大好きです。」を区切ると「犬｜は本｜が大好きです。」になります。人なら「犬｜は｜本｜が」と区切りたくなりますが、このAIは意味を知らず、学習文で並んだ回数だけで決めています。学習文に「私は本」「弟は本」があったので「は本」がよく並ぶ組に見えたのです。</p>
+</details>
+<details>
+<summary>実際の言語AIとの違い</summary>
+<p>実際の言語AIの辞書は、数万〜20万種類ほどのかたまりでできています。文字ではなく、文字をさらに細かくしたデータ（バイト）から始めるので、辞書にない文字が出ません。そのかわり、日本語の1文字が、いくつかのかたまりに分かれることもあります。</p>
+</details>
+
+<div class="links">
+  <a href="../">かんたん版に戻る</a>
+  <a href="../../">講義アプリの一覧へ</a>
+</div>
+<noscript><p>このアプリを動かすには、JavaScriptをオンにしてください。</p></noscript>
+<p class="copy">© 2026 KOBATO BOOKS</p>
+</main>
+<script>
+/* ===== 小さなBPE：かんたん版と同じしくみ ===== */
+var KB_DEFAULT_TEXT=["猫は魚が大好きです。","犬は肉が大好きです。","猫は日なたで寝ています。","犬は公園で走っています。","私は本を読みます。","私は本が大好きです。","弟は本を読んでいます。","兄は公園で寝ています。","鳥は空を飛んでいます。","魚は海で泳いでいます。","今日は雨が降っています。","明日は晴れるでしょう。"].join("\n");
+function kbApply(s,a,b,t){var o=[];for(var i=0;i<s.length;i++){if(i<s.length-1&&s[i]===a&&s[i+1]===b){o.push(t);i++;}else o.push(s[i]);}return o;}
+function kbTrain(text,maxMerges){
+  var lines=text.split(/\n/).map(function(s){return s.trim();}).filter(Boolean);
+  var vocab=["？"],index={"？":0};
+  lines.forEach(function(l){Array.from(l).forEach(function(c){if(!(c in index)){index[c]=vocab.length;vocab.push(c);}});});
+  var baseSize=vocab.length,seqs=lines.map(function(l){return Array.from(l);}),merges=[],totals=[seqs.reduce(function(a,s){return a+s.length;},0)],sizes=[vocab.length];
+  for(var m=0;m<maxMerges;m++){
+    var counts={},order=[];
+    seqs.forEach(function(s){for(var i=0;i<s.length-1;i++){var k=s[i]+"\u0000"+s[i+1];if(!(k in counts)){counts[k]=0;order.push(k);}counts[k]++;}});
+    var best=null,bestN=1;order.forEach(function(k){if(counts[k]>bestN){best=k;bestN=counts[k];}});
+    if(!best)break;
+    var p=best.split("\u0000"),j=p[0]+p[1];
+    merges.push({a:p[0],b:p[1],t:j,n:bestN});
+    if(!(j in index)){index[j]=vocab.length;vocab.push(j);}
+    seqs=seqs.map(function(s){return kbApply(s,p[0],p[1],j);});
+    totals.push(seqs.reduce(function(a,s){return a+s.length;},0));sizes.push(vocab.length);
+  }
+  return {vocab:vocab,index:index,merges:merges,baseSize:baseSize,lines:lines,totals:totals,sizes:sizes};
+}
+
+var $=function(id){return document.getElementById(id);};
+var reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+var model,timer=null;
+
+function vocabAt(k){return model.sizes[k];}
+function tokenize(text,k){
+  var s=Array.from(text.replace(/\s+/g,""));
+  for(var m=0;m<k;m++){var r=model.merges[m];s=kbApply(s,r.a,r.b,r.t);}
+  // k回目までに辞書入りしたかたまりだけを「知っている」とする
+  return s.map(function(t){var id=(t in model.index)?model.index[t]:0;var known=(t in model.index)&&id<vocabAt(k);return {t:t,id:known?id:0,unk:!known};});
+}
+function drawChart(k){
+  var n=model.merges.length,tot=model.totals,maxY=Math.max(tot[0],vocabAt(n))*1.08;
+  var L=34,R=330,T=10,B=160,svg=$("chart");
+  function X(i){return L+(n?(R-L)*i/n:0);}
+  function Y(v){return B-(B-T)*v/maxY;}
+  var g="";
+  var step=maxY>200?50:(maxY>80?40:20);for(var v=0;v<=maxY;v+=step)(function(v){var y=Y(v);g+='<line x1="'+L+'" x2="'+R+'" y1="'+y+'" y2="'+y+'" stroke="var(--grid)"/><text x="'+(L-5)+'" y="'+(y+4)+'" text-anchor="end">'+v+'</text>';})(v);
+  var p1="",p2="";
+  for(var i=0;i<=n;i++){p1+=(i?"L":"M")+X(i).toFixed(1)+","+Y(tot[i]).toFixed(1);p2+=(i?"L":"M")+X(i).toFixed(1)+","+Y(vocabAt(i)).toFixed(1);}
+  g+='<path d="'+p1+'" fill="none" stroke="var(--acc)" stroke-width="2.5"/>';
+  g+='<path d="'+p2+'" fill="none" stroke="var(--two)" stroke-width="2.5"/>';
+  g+='<line x1="'+X(k)+'" x2="'+X(k)+'" y1="'+T+'" y2="'+B+'" stroke="var(--ink)" stroke-dasharray="3 3"/>';
+  g+='<circle cx="'+X(k)+'" cy="'+Y(tot[k])+'" r="4" fill="var(--acc)"/><circle cx="'+X(k)+'" cy="'+Y(vocabAt(k))+'" r="4" fill="var(--two)"/>';
+  g+='<text x="'+L+'" y="'+(B+16)+'">0</text><text x="'+R+'" y="'+(B+16)+'" text-anchor="end">'+n+'</text><text x="'+((L+R)/2)+'" y="'+(B+28)+'" text-anchor="middle">まとめた回数</text>';
+  svg.innerHTML=g;
+}
+function drawTable(k){
+  $("mtab").innerHTML="";
+  model.merges.forEach(function(r,i){
+    var tr=document.createElement("tr");tr.className=(i<k?"done":"todo")+(i===k-1?" cur":"");
+    [i+1,"「"+r.a+"」＋「"+r.b+"」","「"+r.t+"」",r.n+"回",model.index[r.t]].forEach(function(v,c){var td=document.createElement("td");td.textContent=v;if(c>=3)td.className="num";tr.appendChild(td);});
+    $("mtab").appendChild(tr);
+  });
+}
+function drawTokens(k){
+  var toks=tokenize($("txt").value,k),row=$("row");row.innerHTML="";
+  toks.forEach(function(o){var el=document.createElement("span");el.className="tok"+(o.unk?" unk":"");el.innerHTML='<span class="t"></span><span class="n"></span>';el.querySelector(".t").textContent=o.t;el.querySelector(".n").textContent=o.unk?"0":o.id;row.appendChild(el);});
+  $("ids").textContent=toks.length?toks.length+"個："+"["+toks.map(function(o){return o.id;}).join(", ")+"]":"";
+}
+function update(){
+  var k=+$("k").value;
+  $("kv").textContent=k+"回";
+  $("sTok").textContent=model.totals[k]+"個";
+  $("sVoc").textContent=vocabAt(k)+"個";
+  $("sAvg").textContent=(model.totals[k]/model.lines.length).toFixed(1)+"個";
+  $("lastm").textContent=k?k+"回目：「"+model.merges[k-1].a+"」と「"+model.merges[k-1].b+"」→「"+model.merges[k-1].t+"」（"+model.merges[k-1].n+"回並んでいた）":"まだ1つもまとめていません。全部1文字ずつです。";
+  drawChart(k);drawTable(k);drawTokens(k);
+}
+function build(text){
+  model=kbTrain(text,200);
+  $("k").max=model.merges.length;$("k").value=0;update();
+}
+function play(){
+  clearTimeout(timer);$("k").value=0;update();
+  var k=0,n=model.merges.length;
+  (function step(){if(k>=n)return;k++;$("k").value=k;update();timer=setTimeout(step,reduce?0:600);})();
+}
+$("play").addEventListener("click",play);
+$("k").addEventListener("input",function(){clearTimeout(timer);update();});
+$("txt").addEventListener("input",function(){drawTokens(+$("k").value);});
+$("retrain").addEventListener("click",function(){clearTimeout(timer);var t=$("corpus").value.trim();if(t)build(t);});
+$("reset").addEventListener("click",function(){clearTimeout(timer);$("corpus").value=KB_DEFAULT_TEXT;build(KB_DEFAULT_TEXT);});
+$("corpus").value=KB_DEFAULT_TEXT;
+build(KB_DEFAULT_TEXT);
+</script>
+</body>
+</html>
