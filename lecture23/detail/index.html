@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>くわしく見る｜AIが、似た言葉を見つけるまで｜チャピのAI講義室 第23回</title>
+<meta name="description" content="言葉のまわりを数える幅を変えたり、学習に使う文を自分の文に変えたりして、近さの出方を確かめられます。">
+<!-- OGP（SNSで共有したときの表示） -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="チャピのAI講義室｜KOBATO BOOKS">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:title" content="くわしく見る｜AIが、似た言葉を見つけるまで｜チャピのAI講義室 第23回">
+<meta property="og:description" content="数える幅や学習に使う文を変えて、言葉の近さの出方を確かめます。">
+<meta property="og:url" content="https://lecture.kobatobooks.jp/lecture23/detail/">
+<meta property="og:image" content="https://lecture.kobatobooks.jp/lecture23/detail/ogp.png">
+<meta property="og:image:alt" content="チャピのAI講義室 第23回「AIが、似た言葉を見つけるまで」くわしく見る版">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+:root{--bg:#eef2f6;--ink:#1b2a41;--sub:#5b6b80;--card:#fbfcfe;--line:#c7d2df;--acc:#0f7b8a;--acc-soft:#d9eef1;--on-acc:#ffffff;--warn:#a5552a;--bar2:#9aa9bb}
+@media (prefers-color-scheme:dark){:root{--bg:#121a26;--ink:#e6edf6;--sub:#93a3b8;--card:#18212e;--line:#2c394b;--acc:#4cc3d3;--acc-soft:#1d3a42;--on-acc:#0d1b24;--warn:#e39a6f;--bar2:#56667a}}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Hiragino Sans","BIZ UDPGothic","Yu Gothic","Noto Sans JP",system-ui,sans-serif;line-height:1.7;-webkit-text-size-adjust:100%;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+main{max-width:560px;margin:0 auto;padding:24px 16px 56px}
+.tag{font-size:.82rem;color:var(--sub);margin:0 0 4px;font-weight:700}
+h1{font-size:clamp(1.5rem,6.4vw,2rem);line-height:1.35;margin:0 0 6px}
+.lead{color:var(--sub);margin:0 0 18px}
+.cap{display:block;font-size:.8rem;color:var(--sub);font-weight:700;margin:0 0 6px}
+#go{display:block;width:100%;margin:0 0 20px;min-height:60px;font:inherit;font-size:1.2rem;font-weight:800;color:var(--on-acc);background:var(--acc);border:0;border-radius:8px;cursor:pointer}
+#go:active{transform:translateY(2px)}
+#go:focus-visible,a:focus-visible,summary:focus-visible,.chip:focus-visible{outline:3px solid var(--warn);outline-offset:3px}
+#go:disabled{opacity:.7;cursor:default}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px 14px 16px;margin-bottom:14px}
+.prog{display:flex;align-items:baseline;gap:8px;margin:0 0 8px}
+.prog b{font-size:1.6rem;font-variant-numeric:tabular-nums;line-height:1.1}
+.prog span{font-size:.85rem;color:var(--sub);font-weight:700}
+.bar{height:6px;background:var(--line);border-radius:9px;overflow:hidden;margin:0 0 10px}
+.bar i{display:block;height:100%;width:0;background:var(--acc)}
+ol.sents{list-style:none;margin:0;padding:0;columns:2;column-gap:14px;font-size:.92rem}
+@media (max-width:480px){ol.sents{columns:1}}
+ol.sents li{padding:1px 6px;border-radius:4px;color:var(--sub);break-inside:avoid;border-left:3px solid transparent}
+ol.sents li.done{color:var(--ink)}
+ol.sents li.now{background:var(--acc-soft);border-left-color:var(--acc);color:var(--ink);font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:1.1rem;padding:8px 14px;min-height:44px;border:1px solid var(--ink);border-radius:6px;background:var(--bg);color:var(--ink);cursor:pointer}
+.chip[aria-pressed=true]{background:var(--acc);border-color:var(--acc);color:var(--on-acc);font-weight:800}
+.chip:disabled{opacity:.45;cursor:default}
+.hint{font-size:.85rem;color:var(--sub);margin:10px 0 0}
+.rank{margin:0;padding:0;list-style:none}
+.rank li{display:grid;grid-template-columns:3.2em 1fr 3em;align-items:center;column-gap:8px;row-gap:3px;padding:6px 0;border-bottom:1px solid var(--line)}
+.rank li:last-child{border-bottom:0}
+.rank .no{font-size:.85rem;color:var(--sub);font-weight:700}
+.rank .w{font-size:1.1rem;font-weight:700;line-height:1.4}
+.rank .b{grid-column:1/-1;height:8px;background:var(--line);border-radius:9px;overflow:hidden}
+.rank .b i{display:block;height:100%;background:var(--bar2)}
+.rank li.first .b i{background:var(--acc)}
+.rank .s{font-variant-numeric:tabular-nums;text-align:right;font-weight:700}
+.ctx{font-size:.92rem;margin:10px 0 0;color:var(--ink)}
+.ctx b{font-weight:800}
+.flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:4px;text-align:center;font-size:.85rem;font-weight:700;margin:6px 0 2px}
+.flow div{border:1px solid var(--line);border-radius:6px;padding:8px 4px;background:var(--card)}
+.flow .hi{border-color:var(--acc);background:var(--acc-soft)}
+.flow i{font-style:normal;color:var(--sub)}
+.legend{font-size:.82rem;color:var(--sub);margin:6px 0 0}
+details{border-top:1px solid var(--line);padding:10px 0}
+details:last-of-type{border-bottom:1px solid var(--line)}
+summary{cursor:pointer;font-weight:700}
+details p{color:var(--sub);font-size:.92rem}
+.links{display:flex;flex-direction:column;gap:6px;margin-top:22px}
+.links a{color:var(--acc);font-weight:700}
+.copy{text-align:center;font-size:.8rem;color:var(--sub);margin:32px 0 0}
+textarea{width:100%;font:inherit;font-size:1rem;line-height:1.7;padding:10px 12px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink);resize:vertical}
+textarea:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 0}
+.btn{font:inherit;font-weight:800;min-height:44px;padding:8px 16px;border-radius:6px;border:1px solid var(--acc);background:var(--acc);color:var(--on-acc);cursor:pointer}
+.btn.sub{background:transparent;color:var(--ink);border-color:var(--ink);font-weight:700}
+.btn:focus-visible{outline:3px solid var(--warn);outline-offset:3px}
+.seg{display:flex;gap:8px;flex-wrap:wrap}
+.seg label{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:6px 14px;border:1px solid var(--ink);border-radius:6px;background:var(--bg);cursor:pointer;font-weight:700}
+.seg input{accent-color:var(--acc)}
+.seg label:has(input:checked){background:var(--acc-soft);border-color:var(--acc)}
+.chk{display:flex;align-items:center;gap:8px;margin:12px 0 0;font-size:.92rem}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.cmp>div{border:1px solid var(--line);border-radius:6px;padding:8px 10px;background:var(--bg)}
+.cmp h3{font-size:.95rem;margin:0 0 4px}
+.cmp ul{margin:0;padding:0;list-style:none;font-size:.92rem}
+.cmp li{display:flex;justify-content:space-between;gap:8px}
+.cmp li.sh{color:var(--acc);font-weight:800}
+.big{font-size:1.6rem;font-weight:800;font-variant-numeric:tabular-nums}
+select{font:inherit;padding:8px 10px;min-height:44px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink)}
+.msg{font-size:.85rem;color:var(--warn);margin:8px 0 0;min-height:1.2em}
+</style>
+</head>
+<body>
+<main>
+<p class="tag">チャピのAI講義室｜第23回｜くわしく見る</p>
+<h1>言葉のまわりの数え方</h1>
+<p class="lead">数える幅や、学習に使う文を変えて、近さの出方を確かめます。</p>
+
+<section class="panel" aria-label="学習に使う文">
+  <label class="cap" for="txt">学習に使う文（1行に1文。言葉は、スペースで区切ります）</label>
+  <textarea id="txt" rows="9" spellcheck="false"></textarea>
+  <div class="btns">
+    <button type="button" class="btn" id="apply">この文で数え直す</button>
+    <button type="button" class="btn sub" id="reset">もとの12文にもどす</button>
+  </div>
+  <p class="msg" id="msg" role="status"></p>
+</section>
+
+<section class="panel" aria-label="数える幅">
+  <p class="cap">言葉のまわりを数える幅</p>
+  <div class="seg" role="radiogroup" aria-label="数える幅">
+    <label><input type="radio" name="win" value="1">前後1つ</label>
+    <label><input type="radio" name="win" value="2" checked>前後2つ</label>
+    <label><input type="radio" name="win" value="3">前後3つ</label>
+  </div>
+  <p class="legend" id="winnote"></p>
+</section>
+
+<section class="panel" aria-label="言葉を選ぶ">
+  <p class="cap">言葉をタップ</p>
+  <div class="chips" id="chips"></div>
+  <label class="chk" id="nounwrap"><input type="checkbox" id="noun" checked>名詞だけを比べる（もとの12文のとき）</label>
+</section>
+
+<section class="panel" id="result" aria-live="polite" hidden>
+  <p class="cap" id="rtitle"></p>
+  <ol class="rank" id="rank"></ol>
+</section>
+
+<section class="panel" id="cmpbox" hidden aria-label="2つの言葉をくらべる">
+  <p class="cap">2つの言葉の「まわりの回数表」をくらべる</p>
+  <p style="margin:0 0 8px"><span id="aname" style="font-weight:800"></span> と
+    <select id="bsel" aria-label="くらべる相手"></select></p>
+  <div class="count"><span class="big" id="score">–</span><span class="legend" style="margin:0">近さ（0〜1）</span></div>
+  <div class="cmp"><div><h3 id="ha"></h3><ul id="la"></ul></div><div><h3 id="hb"></h3><ul id="lb"></ul></div></div>
+  <p class="legend">色が付いている行が、2つの言葉に共通しているまわりの言葉です。</p>
+</section>
+
+<details>
+<summary>近さは、どう計算しているの？</summary>
+<p>言葉ごとに「まわりの回数表」を作り、2つの表の形が似ているほど1に近くなる数字にしています。表の形が同じなら1、共通するものが何もなければ0です。（数学では、コサイン類似度と呼ばれる方法です）</p>
+</details>
+<details>
+<summary>前後1つだけにすると、どうなるの？</summary>
+<p>もとの12文で前後1つだけを見ると、猫・犬・私・弟・兄・鳥・今日・明日のように、文のはじめに出てくる言葉は、手がかりが「は」しかありません。そのため、どれも近さが1.00になって、区別がつかなくなります。数える幅が狭いと、手がかりが足りないのです。</p>
+</details>
+<details>
+<summary>自分の文を入れるときのコツ</summary>
+<p>日本語は、AIが言葉の切れ目を知らないので、このアプリでは自分でスペースを入れます。同じ言葉が何度も出る文を、10〜20文ほど入れると、近さの違いが見えやすくなります。文が少ないと、偶然の近さが出やすくなります。</p>
+</details>
+
+<div class="links">
+  <a href="../">かんたん版に戻る</a>
+  <a href="../../">アプリ一覧へ</a>
+</div>
+<noscript><p>このアプリを動かすには、JavaScriptをオンにしてください。</p></noscript>
+<p class="copy">© 2026 KOBATO BOOKS</p>
+</main>
+<script>
+var DEFAULT_SENTS=[["猫","は","魚","が","大好き","です"],["犬","は","肉","が","大好き","です"],["猫","は","日なた","で","寝て","います"],["犬","は","公園","で","走って","います"],["私","は","本","を","読み","ます"],["私","は","本","が","大好き","です"],["弟","は","本","を","読んで","います"],["兄","は","公園","で","寝て","います"],["鳥","は","空","を","飛んで","います"],["魚","は","海","で","泳いで","います"],["今日","は","雨","が","降って","います"],["明日","は","晴れる","でしょう"]];
+var NOUNS=["猫","犬","魚","肉","日なた","公園","私","弟","兄","鳥","本","空","海","雨","今日","明日"];
+var DEFAULT_TEXT=DEFAULT_SENTS.map(function(s){return s.join(" ");}).join("\n");
+var $=function(id){return document.getElementById(id);};
+var sents=DEFAULT_SENTS,cooc={},vocab=[],isDefault=true,picked=null;
+
+function parse(text){
+  return text.split(/\n/).map(function(l){return l.trim().split(/[\s\u3000]+/).filter(Boolean);}).filter(function(a){return a.length>0;});
+}
+function getWin(){return +document.querySelector('input[name=win]:checked').value;}
+function build(){
+  var W=getWin();cooc={};var seen={};vocab=[];
+  sents.forEach(function(s){
+    s.forEach(function(w,i){
+      if(!seen[w]){seen[w]=1;vocab.push(w);}
+      cooc[w]=cooc[w]||{};
+      for(var j=Math.max(0,i-W);j<=Math.min(s.length-1,i+W);j++){if(j!==i)cooc[w][s[j]]=(cooc[w][s[j]]||0)+1;}
+    });
+  });
+}
+function cos(a,b){
+  var x=cooc[a]||{},y=cooc[b]||{},d=0,nx=0,ny=0,k;
+  for(k in x){nx+=x[k]*x[k];if(k in y)d+=x[k]*y[k];}
+  for(k in y){ny+=y[k]*y[k];}
+  return (nx&&ny)?d/Math.sqrt(nx*ny):0;
+}
+function cands(){
+  if(isDefault&&$("noun").checked)return NOUNS;
+  return vocab;
+}
+function drawChips(){
+  var c=$("chips");c.innerHTML="";
+  cands().forEach(function(w){
+    var b=document.createElement("button");b.type="button";b.className="chip";b.textContent=w;
+    b.setAttribute("aria-pressed",w===picked?"true":"false");
+    b.addEventListener("click",function(){picked=w;refresh();});
+    c.appendChild(b);
+  });
+  $("nounwrap").hidden=!isDefault;
+}
+function groups(w){
+  var list=cands().filter(function(x){return x!==w;}).map(function(x){return {w:x,c:Math.round(cos(w,x)*100)/100};});
+  list.sort(function(a,b){return b.c-a.c;});
+  var gs=[];
+  list.forEach(function(x,i){var g=gs[gs.length-1];if(g&&g.c===x.c)g.ws.push(x.w);else gs.push({c:x.c,ws:[x.w],rank:i+1});});
+  return gs;
+}
+function ctxList(w,other){
+  var o=cooc[w]||{},p=other?(cooc[other]||{}):{};
+  var arr=Object.keys(o).map(function(k){return {k:k,n:o[k],sh:(k in p)};});
+  arr.sort(function(a,b){return b.n-a.n;});
+  return arr;
+}
+function fillList(ul,arr){
+  ul.innerHTML="";
+  arr.forEach(function(x){var li=document.createElement("li");if(x.sh)li.className="sh";
+    var a=document.createElement("span");a.textContent=x.k;var b=document.createElement("span");b.textContent=x.n+"回";
+    li.appendChild(a);li.appendChild(b);ul.appendChild(li);});
+}
+function refresh(){
+  drawChips();
+  if(!picked||cands().indexOf(picked)<0){
+    $("result").hidden=true;$("cmpbox").hidden=true;
+    if(picked&&cands().indexOf(picked)<0)picked=null;
+    if(!picked)return;
+  }
+  var gs=groups(picked).slice(0,5);
+  $("rtitle").textContent=picked+"に近い言葉";
+  var ol=$("rank");ol.innerHTML="";
+  gs.forEach(function(g){
+    var li=document.createElement("li");if(g.rank===1)li.className="first";
+    li.innerHTML='<span class="no"></span><span class="w"></span><span class="s"></span><span class="b"><i></i></span>';
+    li.querySelector(".no").textContent=g.rank+"位";
+    li.querySelector(".w").textContent=g.ws.join("・");
+    li.querySelector(".b i").style.width=Math.round(g.c*100)+"%";
+    li.querySelector(".s").textContent=g.c.toFixed(2);
+    ol.appendChild(li);
+  });
+  $("result").hidden=false;
+  var bs=$("bsel"),prev=bs.value,opts=cands().filter(function(x){return x!==picked;});
+  bs.innerHTML="";opts.forEach(function(x){var o=document.createElement("option");o.value=x;o.textContent=x;bs.appendChild(o);});
+  var first=gs.length?gs[0].ws[0]:opts[0];
+  bs.value=(opts.indexOf(prev)>=0&&bs.dataset.for===picked)?prev:first;
+  bs.dataset.for=picked;
+  compare();
+}
+function compare(){
+  var a=picked,b=$("bsel").value;
+  if(!a||!b){$("cmpbox").hidden=true;return;}
+  $("aname").textContent=a;$("ha").textContent=a+"のまわり";$("hb").textContent=b+"のまわり";
+  $("score").textContent=cos(a,b).toFixed(2);
+  fillList($("la"),ctxList(a,b));fillList($("lb"),ctxList(b,a));
+  $("cmpbox").hidden=false;
+}
+function winnote(){
+  var W=getWin();
+  $("winnote").textContent=W===1?"前後1つだけだと、手がかりが少なくなります。":W===2?"はじめの設定です。":"前後3つまで見ると、遠くの言葉も手がかりになります。";
+}
+function apply(){
+  var t=parse($("txt").value);
+  if(t.length<2){$("msg").textContent="2文以上入れてください。";return;}
+  if(t.length>60||t.some(function(s){return s.length>40;})){$("msg").textContent="長すぎます。60文以内、1文40語以内にしてください。";return;}
+  $("msg").textContent="";
+  sents=t;isDefault=(sents.map(function(s){return s.join(" ");}).join("\n")===DEFAULT_TEXT);
+  build();winnote();refresh();
+}
+$("apply").addEventListener("click",apply);
+$("reset").addEventListener("click",function(){$("txt").value=DEFAULT_TEXT;picked=null;apply();});
+$("noun").addEventListener("change",function(){refresh();});
+$("bsel").addEventListener("change",compare);
+Array.prototype.forEach.call(document.querySelectorAll("input[name=win]"),function(r){r.addEventListener("change",function(){build();winnote();refresh();});});
+$("txt").value=DEFAULT_TEXT;build();winnote();drawChips();
+</script>
+</body>
+</html>
