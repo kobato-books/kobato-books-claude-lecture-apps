@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>くわしく見る｜AIが、注目する言葉を決めるまで｜チャピのAI講義室 第25回</title>
+<meta name="description" content="探しものの数字と並べる言葉を自分で変えて、AIの注目の割合と、続きの予想がどう変わるかを確かめられます。">
+<!-- OGP（SNSで共有したときの表示） -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="チャピのAI講義室｜KOBATO BOOKS">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:title" content="くわしく見る｜AIが、注目する言葉を決めるまで｜チャピのAI講義室 第25回">
+<meta property="og:description" content="探しものと言葉を変えて、注目の割合の変わり方を確かめます。">
+<meta property="og:url" content="https://lecture.kobatobooks.jp/lecture25/detail/">
+<meta property="og:image" content="https://lecture.kobatobooks.jp/lecture25/detail/ogp.png">
+<meta property="og:image:alt" content="チャピのAI講義室 第25回「AIが、注目する言葉を決めるまで」くわしく見る版">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+:root{--bg:#eef2f6;--ink:#1b2a41;--sub:#5b6b80;--card:#fbfcfe;--line:#c7d2df;--acc:#0f7b8a;--acc-soft:#d9eef1;--on-acc:#ffffff;--warn:#a5552a;--bar2:#9aa9bb}
+@media (prefers-color-scheme:dark){:root{--bg:#121a26;--ink:#e6edf6;--sub:#93a3b8;--card:#18212e;--line:#2c394b;--acc:#4cc3d3;--acc-soft:#1d3a42;--on-acc:#0d1b24;--warn:#e39a6f;--bar2:#56667a}}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Hiragino Sans","BIZ UDPGothic","Yu Gothic","Noto Sans JP",system-ui,sans-serif;line-height:1.7;-webkit-text-size-adjust:100%;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+main{max-width:560px;margin:0 auto;padding:24px 16px 56px}
+.tag{font-size:.82rem;color:var(--sub);margin:0 0 4px;font-weight:700}
+h1{font-size:clamp(1.5rem,6.4vw,2rem);line-height:1.35;margin:0 0 6px}
+.lead{color:var(--sub);margin:0 0 18px}
+.cap{display:block;font-size:.8rem;color:var(--sub);font-weight:700;margin:0 0 6px}
+#go{display:block;width:100%;margin:0 0 20px;min-height:60px;font:inherit;font-size:1.2rem;font-weight:800;color:var(--on-acc);background:var(--acc);border:0;border-radius:8px;cursor:pointer}
+#go:active{transform:translateY(2px)}
+#go:focus-visible,a:focus-visible,summary:focus-visible,.chip:focus-visible{outline:3px solid var(--warn);outline-offset:3px}
+#go:disabled{opacity:.7;cursor:default}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px 14px 16px;margin-bottom:14px}
+.prog{display:flex;align-items:baseline;gap:8px;margin:0 0 8px}
+.prog b{font-size:1.6rem;font-variant-numeric:tabular-nums;line-height:1.1}
+.prog span{font-size:.85rem;color:var(--sub);font-weight:700}
+.bar{height:6px;background:var(--line);border-radius:9px;overflow:hidden;margin:0 0 10px}
+.bar i{display:block;height:100%;width:0;background:var(--acc)}
+ol.sents{list-style:none;margin:0;padding:0;columns:2;column-gap:14px;font-size:.92rem}
+@media (max-width:480px){ol.sents{columns:1}}
+ol.sents li{padding:1px 6px;border-radius:4px;color:var(--sub);break-inside:avoid;border-left:3px solid transparent}
+ol.sents li.done{color:var(--ink)}
+ol.sents li.hit{background:var(--acc-soft);border-left-color:var(--acc);color:var(--ink);font-weight:700}
+ol.sents li.now{background:var(--acc-soft);border-left-color:var(--acc);color:var(--ink);font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:1.1rem;padding:8px 14px;min-height:44px;border:1px solid var(--ink);border-radius:6px;background:var(--bg);color:var(--ink);cursor:pointer}
+.chip[aria-pressed=true]{background:var(--acc);border-color:var(--acc);color:var(--on-acc);font-weight:800}
+.chip:disabled{opacity:.45;cursor:default}
+.hint{font-size:.85rem;color:var(--sub);margin:10px 0 0}
+.rank{margin:0;padding:0;list-style:none}
+.rank li{display:grid;grid-template-columns:3.2em 1fr 3em;align-items:center;column-gap:8px;row-gap:3px;padding:6px 0;border-bottom:1px solid var(--line)}
+.rank li:last-child{border-bottom:0}
+.rank .no{font-size:.85rem;color:var(--sub);font-weight:700}
+.rank .w{font-size:1.1rem;font-weight:700;line-height:1.4}
+.rank .b{grid-column:1/-1;height:8px;background:var(--line);border-radius:9px;overflow:hidden}
+.rank .b i{display:block;height:100%;background:var(--bar2)}
+.rank li.first .b i{background:var(--acc)}
+.rank .s{font-variant-numeric:tabular-nums;text-align:right;font-weight:700}
+.ctx{font-size:.92rem;margin:10px 0 0;color:var(--ink)}
+.ctx b{font-weight:800}
+.flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:4px;text-align:center;font-size:.85rem;font-weight:700;margin:6px 0 2px}
+.flow div{border:1px solid var(--line);border-radius:6px;padding:8px 4px;background:var(--card)}
+.flow .hi{border-color:var(--acc);background:var(--acc-soft)}
+.flow i{font-style:normal;color:var(--sub)}
+.pre{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 4px}
+.tile{font-size:1.15rem;font-weight:700;padding:8px 12px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--sub)}
+.tile.on{background:var(--acc);border-color:var(--acc);color:var(--on-acc)}
+.tile.q{background:transparent;border-style:dashed;color:var(--ink)}
+.verdict{font-weight:800;margin:10px 0 0}
+.legend{font-size:.82rem;color:var(--sub);margin:6px 0 0}
+details{border-top:1px solid var(--line);padding:10px 0}
+details:last-of-type{border-bottom:1px solid var(--line)}
+summary{cursor:pointer;font-weight:700}
+details p{color:var(--sub);font-size:.92rem}
+.links{display:flex;flex-direction:column;gap:6px;margin-top:22px}
+.links a{color:var(--acc);font-weight:700}
+.copy{text-align:center;font-size:.8rem;color:var(--sub);margin:32px 0 0}
+
+.words{display:flex;gap:6px;justify-content:center;margin:4px 0 0;flex-wrap:nowrap}
+.wcol{flex:1 1 0;min-width:0;max-width:110px;text-align:center}
+.wcol .t{font-size:1.05rem;font-weight:700;padding:8px 2px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);word-break:keep-all}
+.wcol.q .t{border-color:var(--acc);border-width:2px}
+.wcol.q.dash .t{border-style:dashed}
+.wcol .sc{font-size:.8rem;color:var(--sub);font-variant-numeric:tabular-nums;min-height:1.4em;margin-top:4px}
+.wcol .pc{font-size:.95rem;font-weight:800;font-variant-numeric:tabular-nums;min-height:1.5em}
+.col{height:84px;display:flex;align-items:flex-end;justify-content:center}
+.col i{display:block;width:60%;background:var(--bar2);border-radius:4px 4px 0 0;min-height:0}
+.wcol.top .col i{background:var(--acc)}
+.arcs{display:block;width:100%;height:46px;margin:0 0 -2px}
+.stepno{font-size:.82rem;color:var(--sub);font-weight:700;margin:0 0 6px}
+
+input[type=range]{width:100%;accent-color:var(--acc)}
+.sl{display:grid;grid-template-columns:4.5em 1fr 2.2em;gap:8px;align-items:center;margin:2px 0}
+.sl span{font-size:.9rem;font-weight:700}.sl output{font-variant-numeric:tabular-nums;text-align:right;font-weight:700}
+.btn{font:inherit;font-weight:700;min-height:44px;padding:8px 14px;border-radius:6px;border:1px solid var(--ink);background:var(--bg);color:var(--ink);cursor:pointer}
+.btn:focus-visible{outline:3px solid var(--warn);outline-offset:3px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th,td{border-bottom:1px solid var(--line);padding:6px 4px;text-align:left;font-variant-numeric:tabular-nums}
+th{color:var(--sub);font-size:.8rem}
+td.n{text-align:right}
+tr.last td{color:var(--sub)}
+.tbl{overflow-x:auto}
+</style>
+</head>
+<body>
+<main>
+<p class="tag">チャピのAI講義室｜第25回｜くわしく見る</p>
+<h1>探しものと言葉を変えてみる</h1>
+<p class="lead">いちばん右の言葉の「探しもの」を変えて、注目の割合がどう動くかを確かめます。</p>
+
+<section class="panel" aria-label="書き出し">
+  <p class="cap">書き出しを作る（言葉を押すと、右に足されます。最大6語）</p>
+  <div class="chips" id="pal"></div>
+  <div class="pre" id="pre" style="margin-top:12px" aria-live="polite"></div>
+  <div class="btns">
+    <button type="button" class="btn" id="back">1語消す</button>
+    <button type="button" class="btn" id="clr">全部消す</button>
+    <button type="button" class="btn" id="rst">「もう 電話 を」にもどす</button>
+  </div>
+  <p class="hint">いちばん右の言葉が、前の言葉を見に行きます。右端が「を」でなくてもかまいません。</p>
+</section>
+
+<section class="panel" aria-label="探しもの">
+  <p class="cap">いちばん右の言葉の「探しもの」（0〜3）</p>
+  <div id="sls"></div>
+  <div class="btns"><button type="button" class="btn" id="qrst">探しものをもとにもどす（全部1）</button></div>
+</section>
+
+<section class="panel" aria-live="polite">
+  <p class="cap">注目の点数と割合</p>
+  <div class="tbl"><table>
+    <thead><tr><th>言葉</th><th>目印・中身</th><th class="n">点数</th><th class="n">割合</th></tr></thead>
+    <tbody id="tb"></tbody>
+  </table></div>
+  <p class="legend">点数＝探しもの×目印（数字をかけて足す）÷2（次元数4の平方根）。割合＝点数を合計100%にそろえたもの。</p>
+</section>
+
+<section class="panel" id="result" aria-live="polite">
+  <p class="cap">混ぜたものから、続きを予想</p>
+  <p class="ctx" id="mix"></p>
+  <ol class="rank" id="rank"></ol>
+  <p class="verdict" id="verdict"></p>
+  <p class="ctx" id="cmp"></p>
+</section>
+
+<details>
+<summary>数字の読み方</summary>
+<p>数字は4つ組で、順に[終わり, 始まり, 電話, 橋]の強さです。「もう」は終わりが3、「今から」は始まりが3、「電話」は電話が3、「橋」は橋が3。「ええと」と「を」は、全部0です。続きの言葉にも、同じ4つ組を付けています：切ります[1,0,1,0]、かけます[0,1,1,1]、閉じます[1,0,0,1]。</p>
+</details>
+<details>
+<summary>探しものを変えると、何が起きるの？</summary>
+<p>たとえば「電話」の探しものだけを3にして、ほかを0にすると、「電話」に注目が集まります。逆に全部0にすると、点数がすべて0になって、割合は同じになります（注目なしと同じです）。</p>
+</details>
+<details>
+<summary>本物の言語AIとは、同じなの？</summary>
+<p>ちがいます。ここの数字は、見やすいように人が決めたものです。本物の言語AIは、探しもの・目印・中身を学習で作り、言葉ごと・場面ごとに変えます。また、全部の言葉が、それぞれ前の言葉を見に行きます。</p>
+</details>
+
+<div class="links">
+  <a href="../">かんたん版に戻る</a>
+  <a href="../../">アプリ一覧へ</a>
+</div>
+<noscript><p>このアプリを動かすには、JavaScriptをオンにしてください。</p></noscript>
+<p class="copy">© 2026 KOBATO BOOKS</p>
+</main>
+<script>
+var D=4,DN=["終わり","始まり","電話","橋"];
+var KEY={"ええと":[0,0,0,0],"もう":[3,0,0,0],"今から":[0,3,0,0],"電話":[0,0,3,0],"橋":[0,0,0,3],"を":[0,0,0,0]};
+var CAND=[["切ります",[1,0,1,0]],["かけます",[0,1,1,1]],["閉じます",[1,0,0,1]]];
+var PAL=["ええと","もう","今から","電話","橋","を"];
+var $=function(id){return document.getElementById(id);};
+var sent=["もう","電話","を"],Q=[1,1,1,1];
+function dot(a,b){var s=0;for(var i=0;i<a.length;i++)s+=a[i]*b[i];return s;}
+function softmax(x){var m=Math.max.apply(null,x),e=x.map(function(v){return Math.exp(v-m);}),s=e.reduce(function(a,b){return a+b;},0);return e.map(function(v){return v/s;});}
+function pct(x){return Math.round(x*100);}
+function f1(x){return (Math.round(x*10)/10).toFixed(1);}
+function draw(){
+  var n=sent.length;
+  var pre=$("pre");pre.innerHTML="";
+  sent.forEach(function(w,i){var t=document.createElement("span");t.className="tile"+(i===n-1?" on":"");t.textContent=w;pre.appendChild(t);});
+  var qq=document.createElement("span");qq.className="tile q";qq.textContent="？";pre.appendChild(qq);
+  var tb=$("tb");tb.innerHTML="";
+  if(!n){$("mix").textContent="言葉を1つ以上入れてください。";$("rank").innerHTML="";$("verdict").textContent="";$("cmp").textContent="";return;}
+  var sc=sent.map(function(w){return dot(Q,KEY[w])/Math.sqrt(D);});
+  var wt=softmax(sc);
+  var mix=[];for(var d=0;d<D;d++){var s=0;sent.forEach(function(w,i){s+=wt[i]*KEY[w][d];});mix.push(s);}
+  var avg=[];for(var d2=0;d2<D;d2++){var a=0;sent.forEach(function(w){a+=KEY[w][d2];});avg.push(a/n);}
+  var pr=softmax(CAND.map(function(c){return dot(mix,c[1]);}));
+  var pa=softmax(CAND.map(function(c){return dot(avg,c[1]);}));
+  sent.forEach(function(w,i){
+    var tr=document.createElement("tr");if(i===n-1)tr.className="last";
+    tr.innerHTML="<td></td><td></td><td class='n'></td><td class='n'></td>";
+    var c=tr.children;c[0].textContent=w+(i===n-1?"（探す側）":"");c[1].textContent="["+KEY[w].join(",")+"]";c[2].textContent=f1(sc[i]);c[3].textContent=pct(wt[i])+"%";
+    tb.appendChild(tr);
+  });
+  $("mix").textContent="混ぜた結果（中身を割合で足したもの）：["+mix.map(f1).join(", ")+"]";
+  var order=CAND.map(function(c,i){return i;}).sort(function(a,b){return pr[b]-pr[a]||a-b;});
+  var ol=$("rank");ol.innerHTML="";
+  order.forEach(function(ci,gi){
+    var li=document.createElement("li");if(gi===0)li.className="first";
+    li.innerHTML='<span class="no"></span><span class="w"></span><span class="s"></span><span class="b"><i></i></span>';
+    li.querySelector(".no").textContent=(gi===0?"1位":"");li.querySelector(".w").textContent=CAND[ci][0];
+    li.querySelector(".b i").style.width=pct(pr[ci])+"%";li.querySelector(".s").textContent=pct(pr[ci])+"%";ol.appendChild(li);
+  });
+  var top=order[0];
+  $("verdict").textContent="続きの予想：「"+CAND[top][0]+"」"+pct(pr[top])+"%";
+  $("cmp").textContent="注目なし（全部の言葉を同じ割合で混ぜる）だと、「"+CAND[top][0]+"」は"+pct(pa[top])+"%でした。";
+}
+function drawSl(){
+  var box=$("sls");box.innerHTML="";
+  DN.forEach(function(nm,i){
+    var r=document.createElement("div");r.className="sl";
+    r.innerHTML='<span></span><input type="range" min="0" max="3" step="0.5"><output></output>';
+    r.querySelector("span").textContent=nm;
+    var inp=r.querySelector("input"),out=r.querySelector("output");
+    inp.value=Q[i];out.textContent=f1(Q[i]);inp.setAttribute("aria-label","探しもの："+nm);
+    inp.addEventListener("input",function(){Q[i]=parseFloat(inp.value);out.textContent=f1(Q[i]);draw();});
+    box.appendChild(r);
+  });
+}
+PAL.forEach(function(w){
+  var b=document.createElement("button");b.type="button";b.className="chip";b.textContent=w;
+  b.addEventListener("click",function(){if(sent.length<6){sent.push(w);draw();}});$("pal").appendChild(b);
+});
+$("back").addEventListener("click",function(){sent.pop();draw();});
+$("clr").addEventListener("click",function(){sent=[];draw();});
+$("rst").addEventListener("click",function(){sent=["もう","電話","を"];draw();});
+$("qrst").addEventListener("click",function(){Q=[1,1,1,1];drawSl();draw();});
+drawSl();draw();
+</script>
+</body>
+</html>
