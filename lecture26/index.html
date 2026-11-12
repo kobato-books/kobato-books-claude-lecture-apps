@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AIが、いくつもの見方で言葉を見るまで｜チャピのAI講義室 第26回</title>
+<meta name="description" content="ボタンを押すたびに、AIが「いつ」「なに」という2つの見方で言葉を見て、結果を合わせて続きを予想するまでを順に見られます。">
+<!-- OGP（SNSで共有したときの表示） -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="チャピのAI講義室｜KOBATO BOOKS">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:title" content="AIが、いくつもの見方で言葉を見るまで｜チャピのAI講義室 第26回">
+<meta property="og:description" content="ボタンを押すたびに、AIが「いつ」「なに」という2つの見方で言葉を見て、結果を合わせて続きを予想するまでを順に見られます。">
+<meta property="og:url" content="https://lecture.kobatobooks.jp/lecture26/">
+<meta property="og:image" content="https://lecture.kobatobooks.jp/lecture26/ogp.png">
+<meta property="og:image:alt" content="チャピのAI講義室 第26回「AIが、いくつもの見方で言葉を見るまで」">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+:root{--bg:#eef2f6;--ink:#1b2a41;--sub:#5b6b80;--card:#fbfcfe;--line:#c7d2df;--acc:#0f7b8a;--acc-soft:#d9eef1;--on-acc:#ffffff;--warn:#a5552a;--bar2:#9aa9bb}
+@media (prefers-color-scheme:dark){:root{--bg:#121a26;--ink:#e6edf6;--sub:#93a3b8;--card:#18212e;--line:#2c394b;--acc:#4cc3d3;--acc-soft:#1d3a42;--on-acc:#0d1b24;--warn:#e39a6f;--bar2:#56667a}}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Hiragino Sans","BIZ UDPGothic","Yu Gothic","Noto Sans JP",system-ui,sans-serif;line-height:1.7;-webkit-text-size-adjust:100%;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+main{max-width:560px;margin:0 auto;padding:24px 16px 56px}
+.tag{font-size:.82rem;color:var(--sub);margin:0 0 4px;font-weight:700}
+h1{font-size:clamp(1.5rem,6.4vw,2rem);line-height:1.35;margin:0 0 6px}
+.lead{color:var(--sub);margin:0 0 18px}
+.cap{display:block;font-size:.8rem;color:var(--sub);font-weight:700;margin:0 0 6px}
+#go{display:block;width:100%;margin:0 0 20px;min-height:60px;font:inherit;font-size:1.2rem;font-weight:800;color:var(--on-acc);background:var(--acc);border:0;border-radius:8px;cursor:pointer}
+#go:active{transform:translateY(2px)}
+#go:focus-visible,a:focus-visible,summary:focus-visible,.chip:focus-visible{outline:3px solid var(--warn);outline-offset:3px}
+#go:disabled{opacity:.7;cursor:default}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px 14px 16px;margin-bottom:14px}
+.prog{display:flex;align-items:baseline;gap:8px;margin:0 0 8px}
+.prog b{font-size:1.6rem;font-variant-numeric:tabular-nums;line-height:1.1}
+.prog span{font-size:.85rem;color:var(--sub);font-weight:700}
+.bar{height:6px;background:var(--line);border-radius:9px;overflow:hidden;margin:0 0 10px}
+.bar i{display:block;height:100%;width:0;background:var(--acc)}
+ol.sents{list-style:none;margin:0;padding:0;columns:2;column-gap:14px;font-size:.92rem}
+@media (max-width:480px){ol.sents{columns:1}}
+ol.sents li{padding:1px 6px;border-radius:4px;color:var(--sub);break-inside:avoid;border-left:3px solid transparent}
+ol.sents li.done{color:var(--ink)}
+ol.sents li.hit{background:var(--acc-soft);border-left-color:var(--acc);color:var(--ink);font-weight:700}
+ol.sents li.now{background:var(--acc-soft);border-left-color:var(--acc);color:var(--ink);font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:1.1rem;padding:8px 14px;min-height:44px;border:1px solid var(--ink);border-radius:6px;background:var(--bg);color:var(--ink);cursor:pointer}
+.chip[aria-pressed=true]{background:var(--acc);border-color:var(--acc);color:var(--on-acc);font-weight:800}
+.chip:disabled{opacity:.45;cursor:default}
+.hint{font-size:.85rem;color:var(--sub);margin:10px 0 0}
+.rank{margin:0;padding:0;list-style:none}
+.rank li{display:grid;grid-template-columns:3.2em 1fr 3em;align-items:center;column-gap:8px;row-gap:3px;padding:6px 0;border-bottom:1px solid var(--line)}
+.rank li:last-child{border-bottom:0}
+.rank .no{font-size:.85rem;color:var(--sub);font-weight:700}
+.rank .w{font-size:1.1rem;font-weight:700;line-height:1.4}
+.rank .b{grid-column:1/-1;height:8px;background:var(--line);border-radius:9px;overflow:hidden}
+.rank .b i{display:block;height:100%;background:var(--bar2)}
+.rank li.first .b i{background:var(--acc)}
+.rank .s{font-variant-numeric:tabular-nums;text-align:right;font-weight:700}
+.ctx{font-size:.92rem;margin:10px 0 0;color:var(--ink)}
+.ctx b{font-weight:800}
+.flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:4px;text-align:center;font-size:.85rem;font-weight:700;margin:6px 0 2px}
+.flow div{border:1px solid var(--line);border-radius:6px;padding:8px 4px;background:var(--card)}
+.flow .hi{border-color:var(--acc);background:var(--acc-soft)}
+.flow i{font-style:normal;color:var(--sub)}
+.pre{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 4px}
+.tile{font-size:1.15rem;font-weight:700;padding:8px 12px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--sub)}
+.tile.on{background:var(--acc);border-color:var(--acc);color:var(--on-acc)}
+.tile.q{background:transparent;border-style:dashed;color:var(--ink)}
+.verdict{font-weight:800;margin:10px 0 0}
+.legend{font-size:.82rem;color:var(--sub);margin:6px 0 0}
+details{border-top:1px solid var(--line);padding:10px 0}
+details:last-of-type{border-bottom:1px solid var(--line)}
+summary{cursor:pointer;font-weight:700}
+details p{color:var(--sub);font-size:.92rem}
+.links{display:flex;flex-direction:column;gap:6px;margin-top:22px}
+.links a{color:var(--acc);font-weight:700}
+.copy{text-align:center;font-size:.8rem;color:var(--sub);margin:32px 0 0}
+
+.words{display:flex;gap:6px;justify-content:center;margin:4px 0 0;flex-wrap:nowrap}
+.wcol{flex:1 1 0;min-width:0;max-width:110px;text-align:center}
+.wcol .t{font-size:1.05rem;font-weight:700;padding:8px 2px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);word-break:keep-all}
+.wcol.q .t{border-color:var(--acc);border-width:2px}
+.wcol.q.dash .t{border-style:dashed}
+.wcol .sc{font-size:.8rem;color:var(--sub);font-variant-numeric:tabular-nums;min-height:1.4em;margin-top:4px}
+.wcol .pc{font-size:.95rem;font-weight:800;font-variant-numeric:tabular-nums;min-height:1.5em}
+.col{height:84px;display:flex;align-items:flex-end;justify-content:center}
+.col i{display:block;width:60%;background:var(--bar2);border-radius:4px 4px 0 0;min-height:0}
+.wcol.top .col i{background:var(--acc)}
+.arcs{display:block;width:100%;height:46px;margin:0 0 -2px}
+.stepno{font-size:.82rem;color:var(--sub);font-weight:700;margin:0 0 6px}
+
+input[type=range]{width:100%;accent-color:var(--acc)}
+.sl{display:grid;grid-template-columns:4.5em 1fr 2.2em;gap:8px;align-items:center;margin:2px 0}
+.sl span{font-size:.9rem;font-weight:700}.sl output{font-variant-numeric:tabular-nums;text-align:right;font-weight:700}
+.btn{font:inherit;font-weight:700;min-height:44px;padding:8px 14px;border-radius:6px;border:1px solid var(--ink);background:var(--bg);color:var(--ink);cursor:pointer}
+.btn:focus-visible{outline:3px solid var(--warn);outline-offset:3px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th,td{border-bottom:1px solid var(--line);padding:6px 4px;text-align:left;font-variant-numeric:tabular-nums}
+th{color:var(--sub);font-size:.8rem}
+td.n{text-align:right}
+tr.last td{color:var(--sub)}
+.tbl{overflow-x:auto}
+
+.rows{display:grid;gap:6px;margin:6px 0 0}
+.rl{font-size:.82rem;color:var(--sub);font-weight:700;margin:10px 0 2px}
+.g{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:6px}
+.g .w{font-size:1.05rem;font-weight:700;padding:8px 2px;border:1px solid var(--line);border-radius:6px;background:var(--bg);text-align:center;word-break:keep-all}
+.g .w.q{border-color:var(--acc);border-width:2px}
+.g .c{border:1px solid var(--line);border-radius:6px;padding:7px 2px;text-align:center;font-weight:800;font-variant-numeric:tabular-nums;color:var(--ink)}
+.g .c.top{border-color:var(--acc);color:var(--ink)}
+.g .c.off{color:var(--sub);font-weight:400}
+.mixl{font-size:.92rem;margin:4px 0 0}
+.mixl b{font-weight:800}
+.sw{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+.chk{display:flex;align-items:center;gap:8px;min-height:44px;font-weight:700}
+.chk input{width:22px;height:22px;accent-color:var(--acc)}
+</style>
+</head>
+<body>
+<main>
+<p class="tag">チャピのAI講義室｜第26回</p>
+<h1>AIが、いくつもの見方で言葉を見るまで</h1>
+<p class="lead">ボタンを押すと、AIが2つの見方で言葉を見て、結果を合わせて、続きを予想します。</p>
+
+<button type="button" id="go">見方ごとの割合を出す</button>
+
+<section class="panel" aria-label="AIに見せる書き出し">
+  <p class="cap">書き出しを選ぶ（このあとの言葉を当てます）</p>
+  <div class="chips" id="chips"></div>
+  <div class="sw"><button type="button" class="chip" id="pos" aria-pressed="false">位置情報：なし</button></div>
+  <p class="hint">「位置情報：あり」にすると、3つ目の見方「直前の言葉」が加わります。</p>
+</section>
+
+<section class="panel" aria-live="polite">
+  <p class="stepno" id="stepno">まだ何もしていません</p>
+  <div class="g" id="words"></div>
+  <div id="rows"></div>
+  <p class="hint" id="hint">いちばん右の言葉が、前の言葉を見に行きます。見方は、「いつ」と「なに」の2つです。</p>
+</section>
+
+<section class="panel" id="result" aria-live="polite">
+  <p class="cap">見方ごとに混ぜた結果</p>
+  <div id="mixes"></div>
+  <p class="cap" style="margin-top:14px">続きの候補</p>
+  <ol class="rank" id="rank"></ol>
+  <p class="verdict" id="verdict">ボタンを3回押すと、ここに出ます。</p>
+  <p class="ctx" id="cmp"></p>
+  <p class="ctx" id="cmp2"></p>
+</section>
+
+<div class="flow" aria-label="しくみ">
+  <div>見方ごとの割合</div><i>›</i><div class="hi">混ぜて合わせる</div><i>›</i><div class="hi">予想</div>
+</div>
+<p class="legend" style="text-align:center;margin-bottom:18px">見方を分けると、決め手に厚く注目できる</p>
+
+<details>
+<summary>何をしているの？</summary>
+<p>前回は、1つの「探しもの」で言葉を見ていました。今回は、見方を2つに分けます。見方A「いつ」は、時を表す言葉（終わり・始まり）を探し、見方B「なに」は、ものを表す言葉（電話・橋）を探します。見方ごとに割合を出し、見方ごとに言葉の中身を混ぜて、結果を横に並べて合わせます。</p>
+</details>
+<details>
+<summary>位置情報って、何？</summary>
+<p>アテンションは、言葉の並び順を知りません。「もう 電話 を」と「電話 もう を」は、同じ言葉の集まりとして扱われ、答えも同じです。そこで、言葉に「何番目か」の情報を足します。このアプリでは、位置情報を使う3つ目の見方「直前」を足しました。いちばん右の言葉の、すぐ左にある言葉を、たくさん見ます。</p>
+</details>
+<details>
+<summary>本物の言語AIとは、同じなの？</summary>
+<p>ちがいます。このアプリの見方の数、探しもの、中身、直前の見方は、見やすいように人が決めたごく小さな例です。本物の言語AIは、見方（ヘッド）を何個も持ち、それぞれの探しものを学習で作ります。位置情報も、数字の目印を言葉に足す形で扱い、そのやり方もいろいろあります。このアプリでは、結果を足し算で合わせましたが、本物は、並べてから学習した計算で合わせます。</p>
+</details>
+
+<div class="links">
+  <a href="detail/">くわしく見る（見方のオン・オフ、言葉の入れ替え）</a>
+  <a href="../">アプリ一覧へ</a>
+</div>
+<noscript><p>このアプリを動かすには、JavaScriptをオンにしてください。</p></noscript>
+<p class="copy">© 2026 KOBATO BOOKS</p>
+</main>
+<script>
+var D=4,DN=["終わり","始まり","電話","橋"];
+var KEY={"ええと":[0,0,0,0],"もう":[3,0,0,0],"今から":[0,3,0,0],"電話":[0,0,3,0],"橋":[0,0,0,3],"を":[0,0,0,0]};
+var CAND=[["切ります",[1,0,1,0]],["かけます",[0,1,1,1]],["閉じます",[1,0,0,1]]];
+var HN=["いつ","なに","直前"];
+var HQ=[[1,1,0,0],[0,0,1,1]];     /* 見方A・Bの探しもの */
+var HD=[[0,1],[2,3],[0,1,2,3]];   /* 見方ごとに見る中身の場所 */
+var $=function(id){return document.getElementById(id);};
+function dot(a,b){var s=0;for(var i=0;i<a.length;i++)s+=a[i]*b[i];return s;}
+function softmax(x){var m=Math.max.apply(null,x),e=x.map(function(v){return Math.exp(v-m);}),s=e.reduce(function(a,b){return a+b;},0);return e.map(function(v){return v/s;});}
+function pct(x){return Math.round(x*100);}
+function f2(x){return (Math.round(x*100)/100).toFixed(2);}
+function f1(x){return (Math.round(x*10)/10).toFixed(1);}
+/* on=[A,B,C]のオン・オフ、pw=直前の見方の点数 */
+function calc(sent,on,pw){
+  var n=sent.length,K=sent.map(function(w){return KEY[w];});
+  var wts=[null,null,null],mixes=[null,null,null],tot=[0,0,0,0];
+  for(var h=0;h<3;h++){
+    if(!on[h])continue;
+    var sc;
+    if(h<2)sc=K.map(function(k){return dot(HQ[h],k)/Math.sqrt(D);});
+    else sc=K.map(function(k,i){return (n-1-i)===1?pw:0;});
+    var w=softmax(sc),m=[0,0,0,0];
+    HD[h].forEach(function(d){K.forEach(function(k,i){m[d]+=w[i]*k[d];});});
+    for(var d2=0;d2<D;d2++)tot[d2]+=m[d2];
+    wts[h]=w;mixes[h]=m;
+  }
+  var any=on[0]||on[1]||on[2];
+  var pr=any?softmax(CAND.map(function(c){return dot(tot,c[1]);})):null;
+  /* 1つの見方（前回）：探しもの全部1、中身も全部 */
+  var sc1=K.map(function(k){return dot([1,1,1,1],k)/Math.sqrt(D);}),w1=softmax(sc1),m1=[0,0,0,0];
+  for(var d3=0;d3<D;d3++)K.forEach(function(k,i){m1[d3]+=w1[i]*k[d3];});
+  var p1=softmax(CAND.map(function(c){return dot(m1,c[1]);}));
+  return {wts:wts,mixes:mixes,tot:tot,pr:pr,p1:p1};
+}
+function mixText(m){var t=[];for(var d=0;d<D;d++)if(m[d]>0.0005)t.push(DN[d]+f2(m[d]));return t.length?t.join("・"):"なし";}
+function rankInto(ol,pr){
+  ol.innerHTML="";
+  var order=CAND.map(function(c,i){return i;}).sort(function(a,b){return pr[b]-pr[a]||a-b;});
+  order.forEach(function(ci,gi){
+    var li=document.createElement("li");if(gi===0)li.className="first";
+    li.innerHTML='<span class="no"></span><span class="w"></span><span class="s"></span><span class="b"><i></i></span>';
+    li.querySelector(".no").textContent=(gi===0?"1位":"");li.querySelector(".w").textContent=CAND[ci][0];
+    li.querySelector(".b i").style.width=pct(pr[ci])+"%";li.querySelector(".s").textContent=pct(pr[ci])+"%";ol.appendChild(li);
+  });
+  return order[0];
+}
+
+var QUERIES=[["もう","電話","を"],["電話","もう","を"],["今から","電話","を"],["ええと","もう","電話","を"]];
+var LABELS=["見方ごとの割合を出す","見方ごとに混ぜて、合わせる","続きを予想する","最初にもどす"];
+var STEPS=["まだ何もしていません","1/3　見方ごとに、割合を出した","2/3　見方ごとに混ぜて、合わせた","3/3　続きを予想した"];
+var RL=["見方A「いつ」（時を表す言葉を探す）","見方B「なに」（ものを表す言葉を探す）","見方C「直前」（すぐ左の言葉を探す）"];
+var step=0,qi=0,pos=false;
+function draw(){
+  var sent=QUERIES[qi],n=sent.length,on=[true,true,pos],r=calc(sent,on,1.5);
+  $("go").textContent=LABELS[step];$("stepno").textContent=STEPS[step];
+  $("pos").textContent="位置情報："+(pos?"あり":"なし");$("pos").setAttribute("aria-pressed",pos?"true":"false");
+  var wd=$("words");wd.style.setProperty("--n",n);wd.innerHTML="";
+  sent.forEach(function(w,i){var d=document.createElement("div");d.className="w"+(i===n-1?" q":"");d.textContent=w;wd.appendChild(d);});
+  var rows=$("rows");rows.innerHTML="";
+  if(step>=1){
+    for(var h=0;h<3;h++){
+      if(!on[h])continue;
+      var lab=document.createElement("p");lab.className="rl";lab.textContent=RL[h];rows.appendChild(lab);
+      var g=document.createElement("div");g.className="g";g.style.setProperty("--n",n);
+      var mx=Math.max.apply(null,r.wts[h]);
+      r.wts[h].forEach(function(w,i){
+        var c=document.createElement("div");c.className="c"+(w===mx?" top":"");c.textContent=pct(w)+"%";
+        var p=Math.round(w*100);c.style.background="linear-gradient(to right,var(--acc-soft) "+p+"%,transparent "+p+"%)";
+        g.appendChild(c);
+      });
+      rows.appendChild(g);
+    }
+  }
+  var mb=$("mixes");mb.innerHTML="";
+  if(step>=2){
+    for(var h2=0;h2<3;h2++){
+      if(!on[h2])continue;
+      var p2=document.createElement("p");p2.className="mixl";
+      var b=document.createElement("b");b.textContent=HN[h2]+"：";
+      p2.appendChild(b);p2.appendChild(document.createTextNode(mixText(r.mixes[h2])));mb.appendChild(p2);
+    }
+    var p3=document.createElement("p");p3.className="mixl";p3.style.marginTop="8px";
+    var b3=document.createElement("b");b3.textContent="合わせた結果：";
+    p3.appendChild(b3);p3.appendChild(document.createTextNode(mixText(r.tot)));mb.appendChild(p3);
+  }else{
+    var p4=document.createElement("p");p4.className="mixl";p4.style.color="var(--sub)";p4.textContent=step===0?"ここに、見方ごとの結果が出ます。":"2回目のボタンで、ここに出ます。";mb.appendChild(p4);
+  }
+  var ol=$("rank");ol.innerHTML="";
+  if(step===3){
+    var top=rankInto(ol,r.pr);
+    $("verdict").textContent="続きの予想：「"+CAND[top][0]+"」"+pct(r.pr[top])+"%";
+    $("cmp").textContent="1つの見方（前回のやり方）だと、「"+CAND[top][0]+"」は"+pct(r.p1[top])+"%でした。";
+    if(pos){var r0=calc(sent,[true,true,false],1.5);$("cmp2").textContent="位置情報なし（見方2つ）だと、「"+CAND[top][0]+"」は"+pct(r0.pr[top])+"%でした。";}
+    else $("cmp2").textContent="";
+  }else{
+    $("verdict").textContent=step===0?"ボタンを3回押すと、ここに出ます。":"あと"+(3-step)+"回、押してください。";
+    $("cmp").textContent="";$("cmp2").textContent="";
+  }
+  var cs=$("chips").children;
+  for(var i2=0;i2<cs.length;i2++)cs[i2].setAttribute("aria-pressed",i2===qi?"true":"false");
+}
+QUERIES.forEach(function(s,i){
+  var b=document.createElement("button");b.type="button";b.className="chip";b.textContent=s.join(" ")+" ？";
+  b.addEventListener("click",function(){qi=i;draw();});$("chips").appendChild(b);
+});
+$("pos").addEventListener("click",function(){pos=!pos;draw();});
+$("go").addEventListener("click",function(){step=(step+1)%4;draw();});
+draw();
+</script>
+</body>
+</html>
