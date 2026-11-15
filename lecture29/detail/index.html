@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>お手本の周数と、人の好みを変えてみる｜チャピのAI講義室 第29回（くわしく見る版）</title>
+<meta name="description" content="お手本を覚える周数、人が見比べる回数、評価する人の好みを変えて、AIの答えがどう変わるかを見られます。">
+<!-- OGP（SNSで共有したときの表示） -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="チャピのAI講義室｜KOBATO BOOKS">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:title" content="お手本の周数と、人の好みを変えてみる｜チャピのAI講義室 第29回（くわしく見る版）">
+<meta property="og:description" content="お手本を覚える周数、人が見比べる回数、評価する人の好みを変えて、AIの答えがどう変わるかを見られます。">
+<meta property="og:url" content="https://lecture.kobatobooks.jp/lecture29/detail/">
+<meta property="og:image" content="https://lecture.kobatobooks.jp/lecture29/detail/ogp.png">
+<meta property="og:image:alt" content="お手本の周数と、人の好みを変えてみる｜チャピのAI講義室 第29回（くわしく見る版）">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+:root{--bg:#eef2f6;--ink:#1b2a41;--sub:#5b6b80;--card:#fbfcfe;--line:#c7d2df;--acc:#0f7b8a;--acc-soft:#d9eef1;--on-acc:#ffffff;--warn:#a5552a;--bar2:#9aa9bb}
+@media (prefers-color-scheme:dark){:root{--bg:#121a26;--ink:#e6edf6;--sub:#93a3b8;--card:#18212e;--line:#2c394b;--acc:#4cc3d3;--acc-soft:#1d3a42;--on-acc:#0d1b24;--warn:#e39a6f;--bar2:#56667a}}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Hiragino Sans","BIZ UDPGothic","Yu Gothic","Noto Sans JP",system-ui,sans-serif;line-height:1.7;-webkit-text-size-adjust:100%;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+main{max-width:560px;margin:0 auto;padding:24px 16px 56px}
+.tag{font-size:.82rem;color:var(--sub);margin:0 0 4px;font-weight:700}
+h1{font-size:clamp(1.5rem,6.4vw,2rem);line-height:1.35;margin:0 0 6px}
+.lead{color:var(--sub);margin:0 0 18px}
+.cap{display:block;font-size:.8rem;color:var(--sub);font-weight:700;margin:0 0 6px}
+#go{display:block;width:100%;margin:0 0 20px;min-height:60px;font:inherit;font-size:1.2rem;font-weight:800;color:var(--on-acc);background:var(--acc);border:0;border-radius:8px;cursor:pointer}
+#go:active{transform:translateY(2px)}
+#go:focus-visible,a:focus-visible,summary:focus-visible,.chip:focus-visible{outline:3px solid var(--warn);outline-offset:3px}
+#go:disabled{opacity:.7;cursor:default}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px 14px 16px;margin-bottom:14px}
+.prog{display:flex;align-items:baseline;gap:8px;margin:0 0 8px}
+.prog b{font-size:1.6rem;font-variant-numeric:tabular-nums;line-height:1.1}
+.prog span{font-size:.85rem;color:var(--sub);font-weight:700}
+.bar{height:6px;background:var(--line);border-radius:9px;overflow:hidden;margin:0 0 10px}
+.bar i{display:block;height:100%;width:0;background:var(--acc)}
+ol.sents{list-style:none;margin:0;padding:0;columns:2;column-gap:14px;font-size:.92rem}
+@media (max-width:480px){ol.sents{columns:1}}
+ol.sents li{padding:1px 6px;border-radius:4px;color:var(--sub);break-inside:avoid;border-left:3px solid transparent}
+ol.sents li.done{color:var(--ink)}
+ol.sents li.hit{background:var(--acc-soft);border-left-color:var(--acc);color:var(--ink);font-weight:700}
+ol.sents li.now{background:var(--acc-soft);border-left-color:var(--acc);color:var(--ink);font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:1.1rem;padding:8px 14px;min-height:44px;border:1px solid var(--ink);border-radius:6px;background:var(--bg);color:var(--ink);cursor:pointer}
+.chip[aria-pressed=true]{background:var(--acc);border-color:var(--acc);color:var(--on-acc);font-weight:800}
+.chip:disabled{opacity:.45;cursor:default}
+.hint{font-size:.85rem;color:var(--sub);margin:10px 0 0}
+.rank{margin:0;padding:0;list-style:none}
+.rank li{display:grid;grid-template-columns:3.2em 1fr 3em;align-items:center;column-gap:8px;row-gap:3px;padding:6px 0;border-bottom:1px solid var(--line)}
+.rank li:last-child{border-bottom:0}
+.rank .no{font-size:.85rem;color:var(--sub);font-weight:700}
+.rank .w{font-size:1.1rem;font-weight:700;line-height:1.4}
+.rank .b{grid-column:1/-1;height:8px;background:var(--line);border-radius:9px;overflow:hidden}
+.rank .b i{display:block;height:100%;background:var(--bar2)}
+.rank li.first .b i{background:var(--acc)}
+.rank .s{font-variant-numeric:tabular-nums;text-align:right;font-weight:700}
+.ctx{font-size:.92rem;margin:10px 0 0;color:var(--ink)}
+.ctx b{font-weight:800}
+.flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:4px;text-align:center;font-size:.85rem;font-weight:700;margin:6px 0 2px}
+.flow div{border:1px solid var(--line);border-radius:6px;padding:8px 4px;background:var(--card)}
+.flow .hi{border-color:var(--acc);background:var(--acc-soft)}
+.flow i{font-style:normal;color:var(--sub)}
+.pre{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 4px}
+.tile{font-size:1.15rem;font-weight:700;padding:8px 12px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--sub)}
+.tile.on{background:var(--acc);border-color:var(--acc);color:var(--on-acc)}
+.tile.q{background:transparent;border-style:dashed;color:var(--ink)}
+.verdict{font-weight:800;margin:10px 0 0}
+.legend{font-size:.82rem;color:var(--sub);margin:6px 0 0}
+details{border-top:1px solid var(--line);padding:10px 0}
+details:last-of-type{border-bottom:1px solid var(--line)}
+summary{cursor:pointer;font-weight:700}
+details p{color:var(--sub);font-size:.92rem}
+.links{display:flex;flex-direction:column;gap:6px;margin-top:22px}
+.links a{color:var(--acc);font-weight:700}
+.copy{text-align:center;font-size:.8rem;color:var(--sub);margin:32px 0 0}
+
+.words{display:flex;gap:6px;justify-content:center;margin:4px 0 0;flex-wrap:nowrap}
+.wcol{flex:1 1 0;min-width:0;max-width:110px;text-align:center}
+.wcol .t{font-size:1.05rem;font-weight:700;padding:8px 2px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);word-break:keep-all}
+.wcol.q .t{border-color:var(--acc);border-width:2px}
+.wcol.q.dash .t{border-style:dashed}
+.wcol .sc{font-size:.8rem;color:var(--sub);font-variant-numeric:tabular-nums;min-height:1.4em;margin-top:4px}
+.wcol .pc{font-size:.95rem;font-weight:800;font-variant-numeric:tabular-nums;min-height:1.5em}
+.col{height:84px;display:flex;align-items:flex-end;justify-content:center}
+.col i{display:block;width:60%;background:var(--bar2);border-radius:4px 4px 0 0;min-height:0}
+.wcol.top .col i{background:var(--acc)}
+.arcs{display:block;width:100%;height:46px;margin:0 0 -2px}
+.stepno{font-size:.82rem;color:var(--sub);font-weight:700;margin:0 0 6px}
+
+input[type=range]{width:100%;accent-color:var(--acc)}
+.sl{display:grid;grid-template-columns:4.5em 1fr 2.2em;gap:8px;align-items:center;margin:2px 0}
+.sl span{font-size:.9rem;font-weight:700}.sl output{font-variant-numeric:tabular-nums;text-align:right;font-weight:700}
+.btn{font:inherit;font-weight:700;min-height:44px;padding:8px 14px;border-radius:6px;border:1px solid var(--ink);background:var(--bg);color:var(--ink);cursor:pointer}
+.btn:focus-visible{outline:3px solid var(--warn);outline-offset:3px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th,td{border-bottom:1px solid var(--line);padding:6px 4px;text-align:left;font-variant-numeric:tabular-nums}
+th{color:var(--sub);font-size:.8rem}
+td.n{text-align:right}
+tr.last td{color:var(--sub)}
+.tbl{overflow-x:auto}
+
+.rows{display:grid;gap:6px;margin:6px 0 0}
+.rl{font-size:.82rem;color:var(--sub);font-weight:700;margin:10px 0 2px}
+.g{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:6px}
+.g .w{font-size:1.05rem;font-weight:700;padding:8px 2px;border:1px solid var(--line);border-radius:6px;background:var(--bg);text-align:center;word-break:keep-all}
+.g .w.q{border-color:var(--acc);border-width:2px}
+.g .c{border:1px solid var(--line);border-radius:6px;padding:7px 2px;text-align:center;font-weight:800;font-variant-numeric:tabular-nums;color:var(--ink)}
+.g .c.top{border-color:var(--acc);color:var(--ink)}
+.g .c.off{color:var(--sub);font-weight:400}
+.mixl{font-size:.92rem;margin:4px 0 0}
+.mixl b{font-weight:800}
+.sw{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+.chk{display:flex;align-items:center;gap:8px;min-height:44px;font-weight:700}
+.chk input{width:22px;height:22px;accent-color:var(--acc)}
+.q3{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 10px}
+.big{font-size:2rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
+.chart{display:block;width:100%;height:auto;margin:6px 0 0}
+.chart .ax{stroke:var(--line);stroke-width:1}
+.chart .ln{fill:none;stroke:var(--acc);stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
+.chart .dt{fill:var(--acc)}
+.chart text{fill:var(--sub);font-size:11px;font-family:inherit}
+.note{font-size:.88rem;color:var(--sub);margin:8px 0 0}
+
+.ans{list-style:none;margin:0;padding:0}
+.ans li{padding:8px 0;border-bottom:1px solid var(--line)}
+.ans li:last-child{border-bottom:0}
+.ans .row{display:grid;grid-template-columns:1fr 3em;gap:8px;align-items:baseline}
+.ans .tx{font-size:1rem;font-weight:700;line-height:1.5}
+.ans .ty{font-size:.78rem;color:var(--sub);font-weight:700;margin-left:6px}
+.ans .s{font-variant-numeric:tabular-nums;text-align:right;font-weight:800}
+.ans .b{height:8px;background:var(--line);border-radius:9px;overflow:hidden;margin-top:4px}
+.ans .b i{display:block;height:100%;background:var(--bar2)}
+.ans li.first .b i{background:var(--acc)}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0 0}
+.cmp div{border:1px solid var(--line);border-radius:6px;padding:8px;font-size:.92rem;font-weight:700;background:var(--bg)}
+.cmp div.win{border-color:var(--acc);border-width:2px;background:var(--acc-soft)}
+.cmp small{display:block;font-size:.75rem;color:var(--sub);font-weight:700}
+.rd{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 0}
+.rd label{display:flex;align-items:center;gap:6px;min-height:44px;font-weight:700;border:1px solid var(--line);border-radius:6px;padding:0 12px;background:var(--bg)}
+.rd input{width:20px;height:20px;accent-color:var(--acc)}
+</style>
+</head>
+<body>
+<main>
+<p class="tag">チャピのAI講義室｜第29回｜くわしく見る版</p>
+<h1>お手本の周数と、人の好みを変えてみる</h1>
+<p class="lead">お手本を覚える周数、人が見比べる回数、評価する人の好みを変えて、AIの答えがどう変わるかを見ます。</p>
+
+<section class="panel">
+  <div class="sl" style="grid-template-columns:8em 1fr 2.6em"><span>お手本の周数</span><input type="range" id="sep" min="0" max="10" step="1" value="3" aria-label="お手本の周数"><output id="sepo">3</output></div>
+  <div class="sl" style="grid-template-columns:8em 1fr 2.6em"><span>見比べる回数</span><input type="range" id="hn" min="0" max="24" step="1" value="12" aria-label="人が見比べる回数"><output id="hno">12</output></div>
+  <div class="sl" style="grid-template-columns:8em 1fr 2.6em"><span>動かす大きさ</span><input type="range" id="lr" min="0.1" max="1.0" step="0.1" value="0.5" aria-label="お手本で動かす大きさ"><output id="lro">0.5</output></div>
+  <p class="cap" style="margin-top:12px">評価する人の好み</p>
+  <div class="rd"><label><input type="radio" name="pref" value="0" checked>ていねいな答えが好き</label><label><input type="radio" name="pref" value="1">短い答えが好き</label></div>
+  <div class="btns"><button type="button" class="btn" id="reset">もとの設定（3周・12回・0.5・ていねい）</button></div>
+  <p class="note">「動かす大きさ」は、お手本を覚えるときの大きさです。人が見比べるときの大きさは、1.0に固定しています。</p>
+</section>
+
+<section class="panel" aria-live="polite">
+  <p class="cap">「ていねいに答えている答え」の出やすさ（3つの指示の平均）</p>
+  <div class="big" id="avg"></div>
+  <svg class="chart" id="chart" viewBox="0 0 320 150" role="img" aria-label="見比べる回数ごとの、良い答えの出やすさの変化"></svg>
+  <p class="note" id="chartnote"></p>
+</section>
+
+<section class="panel" aria-live="polite">
+  <p class="cap">指示ごとの、答えの出やすさ</p>
+  <div class="tbl"><table><thead><tr><th>答えの種類</th><th class="n">お礼のメール</th><th class="n">カレー</th><th class="n">おすすめの本</th></tr></thead><tbody id="tb"></tbody></table></div>
+  <p class="note">「おすすめの本」は、お手本にも見比べにも使っていない指示です。</p>
+</section>
+
+<section class="panel" aria-live="polite">
+  <p class="cap">3つの特徴の点数（動かした数字）</p>
+  <p class="ctx" id="wts"></p>
+</section>
+
+<details>
+<summary>人の好みで、なぜ答えが変わるの？</summary>
+<p>人が見比べて選んだ答えが出やすくなるように、数字を動かすからです。「ていねいな答えが好き」な人が選ぶと、「ていねい」の点数が上がります。「短い答えが好き」な人が選ぶと、「ていねい」の点数が下がり、ぶっきらぼうな短い答えが出やすくなります。どちらも、「指示に答えている」ことと「くり返しがない」ことは、同じように良いとしています。本物の言語AIでも、評価する人の好みや基準が、答え方に反映されます。</p>
+</details>
+<details>
+<summary>数字は、どう動かしているの？</summary>
+<p>お手本：指示ごとに、いまの数字で答えの確率を出し、お手本の答えの確率が足りなかった分だけ、お手本に近い特徴の点数を上げます。見比べ：選ばれた答えと、選ばれなかった答えの点数の差が小さいほど、大きく動かします。選ばれた答えの特徴を上げ、選ばれなかった答えの特徴を下げます。</p>
+</details>
+<details>
+<summary>本物の言語AIとは、同じなの？</summary>
+<p>ちがいます。3つの数字だけの、ごく小さな例です。実際の計算結果ではありません。</p>
+</details>
+
+<div class="links">
+  <a href="../">かんたん版へ</a>
+  <a href="../../">アプリ一覧へ</a>
+</div>
+<noscript><p>このアプリを動かすには、JavaScriptをオンにしてください。</p></noscript>
+<p class="copy">© 2026 KOBATO BOOKS</p>
+</main>
+<script>
+var BS=[[2.0,1.0,0.5,0.5],[1.8,0.8,0.8,0.6],[2.2,0.6,0.4,0.3]];
+var F=[[0,0,1],[0,0,0],[1,0,0],[1,1,0]];
+var PROMPTS=["お礼のメールを書いて","カレーの作り方を教えて","おすすめの本を教えて"];
+var ANS=[["お礼のメールを書いて、お礼のメールを書いて、…","今日は、天気がいいですね。","ありがとう。またね。","先日はありがとうございました。おかげで助かりました。"],
+["カレーの作り方を教えて、カレーの作り方を教えて、…","明日は、会議があります。","切って、煮て、ルーを入れる。","野菜と肉を切って炒め、水を加えて煮ます。最後にルーを溶かします。"],
+["おすすめの本を教えて、おすすめの本を教えて、…","駅は、あちらです。","小説がいいよ。","どんな本が好きですか？ 小説なら、読みやすい短編からいかがでしょう。"]];
+var TYPES=["指示のくり返し","的外れ","答えているが、ぶっきらぼう","答えていて、ていねい"];
+var PAIRS=[[0,3,2],[1,2,0],[0,3,1],[1,2,1],[1,3,0],[0,3,2]];
+function softmax(x){var m=Math.max.apply(null,x),e=x.map(function(v){return Math.exp(v-m);}),s=e.reduce(function(a,b){return a+b;},0);return e.map(function(v){return v/s;});}
+function zs(w,p){return F.map(function(f,i){return BS[p][i]+w[0]*f[0]+w[1]*f[1]+w[2]*f[2];});}
+function probs(w,p){return softmax(zs(w,p));}
+function sft(w,lr,ep){for(var e=0;e<ep;e++){for(var p=0;p<2;p++){var pr=probs(w,p);for(var k=0;k<3;k++){var ex=0;for(var i=0;i<4;i++)ex+=pr[i]*F[i][k];w[k]+=lr*(F[3][k]-ex);}}}}
+function hscore(i,pref){var f=F[i];return 2*f[0]+(pref===0?f[1]:-f[1])-f[2];}
+function judge(j,pref){var t=PAIRS[j%6],x=t[1],y=t[2],win=hscore(x,pref)>=hscore(y,pref)?x:y,lose=win===x?y:x;return {p:t[0],win:win,lose:lose};}
+function human(w,lr,n,pref){for(var j=0;j<n;j++){var d=judge(j,pref),z=zs(w,d.p),g=1-1/(1+Math.exp(-(z[d.win]-z[d.lose])));for(var k=0;k<3;k++)w[k]+=lr*g*(F[d.win][k]-F[d.lose][k]);}}
+function weights(slr,sep,hlr,hn,pref){var w=[0,0,0];sft(w,slr,sep);human(w,hlr,hn,pref);return w;}
+function goodAvg(w){var s=0;for(var p=0;p<3;p++)s+=probs(w,p)[3];return s/3;}
+var $=function(id){return document.getElementById(id);};
+function pct(x){return Math.round(x*100);}
+function pct1(x){return (Math.round(x*1000)/10).toFixed(1)+"%";}
+
+var TY=["指示のくり返し","的外れ","答えているが、ぶっきらぼう","答えていて、ていねい"];
+function cfg(){var pr=document.querySelector('input[name=pref]:checked');return {sep:+$("sep").value,hn:+$("hn").value,lr:+$("lr").value,pref:+pr.value};}
+function chart(c){
+  var s=$("chart"),W=320,H=150,L=34,R=18,T=8,B=24,pw=W-L-R,ph=H-T-B,h='';
+  var X=function(i){return L+pw*i/24;},Y=function(v){return T+ph*(1-v);};
+  [0,0.5,1].forEach(function(v){h+='<line class="ax" x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(v)+'" y2="'+Y(v)+'"/><text x="'+(L-4)+'" y="'+(Y(v)+4)+'" text-anchor="end">'+pct(v)+'%</text>';});
+  [0,6,12,18,24].forEach(function(i){h+='<text x="'+X(i)+'" y="'+(H-6)+'" text-anchor="middle">'+i+'回</text>';});
+  var pts=[],cur=null;for(var i=0;i<=24;i++){var v=goodAvg(weights(c.lr,c.sep,1.0,i,c.pref));pts.push(X(i).toFixed(1)+","+Y(v).toFixed(1));if(i===c.hn)cur=v;}
+  h+='<polyline class="ln" points="'+pts.join(" ")+'"/><circle class="dt" r="4.5" cx="'+X(c.hn).toFixed(1)+'" cy="'+Y(cur).toFixed(1)+'"/>';
+  s.innerHTML=h;
+}
+function draw(){
+  var c=cfg();$("sepo").textContent=c.sep;$("hno").textContent=c.hn;$("lro").textContent=c.lr.toFixed(1);
+  var w=weights(c.lr,c.sep,1.0,c.hn,c.pref),avg=goodAvg(w);
+  $("avg").textContent=pct1(avg);chart(c);
+  $("chartnote").textContent="横軸は、お手本"+c.sep+"周のあとに、人が見比べた回数です。好みは「"+(c.pref===0?"ていねいな答え":"短い答え")+"」。";
+  var tb=$("tb");tb.innerHTML="";
+  var P=[0,1,2].map(function(p){return probs(w,p);});
+  [3,2,0,1].forEach(function(i){var tr=document.createElement("tr");var a=document.createElement("td");a.textContent=TY[i];tr.appendChild(a);
+    P.forEach(function(pr){var td=document.createElement("td");td.className="n";td.textContent=pct1(pr[i]);tr.appendChild(td);});tb.appendChild(tr);});
+  $("wts").textContent="指示に答えている："+w[0].toFixed(2)+"　ていねい："+w[1].toFixed(2)+"　指示のくり返し："+w[2].toFixed(2)+"　（最初は、どれも0）";
+}
+["sep","hn","lr"].forEach(function(id){$(id).addEventListener("input",draw);});
+Array.prototype.forEach.call(document.getElementsByName("pref"),function(r){r.addEventListener("change",draw);});
+$("reset").addEventListener("click",function(){$("sep").value=3;$("hn").value=12;$("lr").value=0.5;document.querySelector('input[name=pref][value="0"]').checked=true;draw();});
+draw();
+</script>
+</body>
+</html>
