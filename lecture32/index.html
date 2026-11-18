@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AIが、会話の最初を忘れるまで｜チャピのAI講義室 第32回</title>
+<meta name="description" content="長い会話の最初に伝えた「合言葉」を、AIは、会話が長くなっても覚えているか。AIが一度に読める量（窓）の限りを、見られます。">
+<!-- OGP（SNSで共有したときの表示） -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="チャピのAI講義室｜KOBATO BOOKS">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:title" content="AIが、会話の最初を忘れるまで｜チャピのAI講義室 第32回">
+<meta property="og:description" content="長い会話の最初に伝えた「合言葉」を、AIは、会話が長くなっても覚えているか。AIが一度に読める量（窓）の限りを、見られます。">
+<meta property="og:url" content="https://lecture.kobatobooks.jp/lecture32/">
+<meta property="og:image" content="https://lecture.kobatobooks.jp/lecture32/ogp.png">
+<meta property="og:image:alt" content="AIが、会話の最初を忘れるまで｜チャピのAI講義室 第32回">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+:root{--bg:#eef2f6;--ink:#1b2a41;--sub:#5b6b80;--card:#fbfcfe;--line:#c7d2df;--acc:#0f7b8a;--acc-soft:#d9eef1;--on-acc:#ffffff;--warn:#a5552a;--bar2:#9aa9bb}
+@media (prefers-color-scheme:dark){:root{--bg:#121a26;--ink:#e6edf6;--sub:#93a3b8;--card:#18212e;--line:#2c394b;--acc:#4cc3d3;--acc-soft:#1d3a42;--on-acc:#0d1b24;--warn:#e39a6f;--bar2:#56667a}}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Hiragino Sans","BIZ UDPGothic","Yu Gothic","Noto Sans JP",system-ui,sans-serif;line-height:1.7;-webkit-text-size-adjust:100%;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+main{max-width:560px;margin:0 auto;padding:24px 16px 56px}
+.tag{font-size:.82rem;color:var(--sub);margin:0 0 4px;font-weight:700}
+h1{font-size:clamp(1.5rem,6.4vw,2rem);line-height:1.35;margin:0 0 6px}
+.lead{color:var(--sub);margin:0 0 18px}
+.cap{display:block;font-size:.8rem;color:var(--sub);font-weight:700;margin:0 0 6px}
+#go{display:block;width:100%;margin:0 0 20px;min-height:60px;font:inherit;font-size:1.2rem;font-weight:800;color:var(--on-acc);background:var(--acc);border:0;border-radius:8px;cursor:pointer}
+#go:active{transform:translateY(2px)}
+#go:focus-visible,a:focus-visible,summary:focus-visible,.chip:focus-visible{outline:3px solid var(--warn);outline-offset:3px}
+#go:disabled{opacity:.7;cursor:default}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px 14px 16px;margin-bottom:14px}
+.prog{display:flex;align-items:baseline;gap:8px;margin:0 0 8px}
+.prog b{font-size:1.6rem;font-variant-numeric:tabular-nums;line-height:1.1}
+.prog span{font-size:.85rem;color:var(--sub);font-weight:700}
+.bar{height:6px;background:var(--line);border-radius:9px;overflow:hidden;margin:0 0 10px}
+.bar i{display:block;height:100%;width:0;background:var(--acc)}
+ol.sents{list-style:none;margin:0;padding:0;columns:2;column-gap:14px;font-size:.92rem}
+@media (max-width:480px){ol.sents{columns:1}}
+ol.sents li{padding:1px 6px;border-radius:4px;color:var(--sub);break-inside:avoid;border-left:3px solid transparent}
+ol.sents li.done{color:var(--ink)}
+ol.sents li.hit{background:var(--acc-soft);border-left-color:var(--acc);color:var(--ink);font-weight:700}
+ol.sents li.now{background:var(--acc-soft);border-left-color:var(--acc);color:var(--ink);font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:1.1rem;padding:8px 14px;min-height:44px;border:1px solid var(--ink);border-radius:6px;background:var(--bg);color:var(--ink);cursor:pointer}
+.chip[aria-pressed=true]{background:var(--acc);border-color:var(--acc);color:var(--on-acc);font-weight:800}
+.chip:disabled{opacity:.45;cursor:default}
+.hint{font-size:.85rem;color:var(--sub);margin:10px 0 0}
+.rank{margin:0;padding:0;list-style:none}
+.rank li{display:grid;grid-template-columns:3.2em 1fr 3em;align-items:center;column-gap:8px;row-gap:3px;padding:6px 0;border-bottom:1px solid var(--line)}
+.rank li:last-child{border-bottom:0}
+.rank .no{font-size:.85rem;color:var(--sub);font-weight:700}
+.rank .w{font-size:1.1rem;font-weight:700;line-height:1.4}
+.rank .b{grid-column:1/-1;height:8px;background:var(--line);border-radius:9px;overflow:hidden}
+.rank .b i{display:block;height:100%;background:var(--bar2)}
+.rank li.first .b i{background:var(--acc)}
+.rank .s{font-variant-numeric:tabular-nums;text-align:right;font-weight:700}
+.ctx{font-size:.92rem;margin:10px 0 0;color:var(--ink)}
+.ctx b{font-weight:800}
+.flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:4px;text-align:center;font-size:.85rem;font-weight:700;margin:6px 0 2px}
+.flow div{border:1px solid var(--line);border-radius:6px;padding:8px 4px;background:var(--card)}
+.flow .hi{border-color:var(--acc);background:var(--acc-soft)}
+.flow i{font-style:normal;color:var(--sub)}
+.pre{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 4px}
+.tile{font-size:1.15rem;font-weight:700;padding:8px 12px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--sub)}
+.tile.on{background:var(--acc);border-color:var(--acc);color:var(--on-acc)}
+.tile.q{background:transparent;border-style:dashed;color:var(--ink)}
+.verdict{font-weight:800;margin:10px 0 0}
+.legend{font-size:.82rem;color:var(--sub);margin:6px 0 0}
+details{border-top:1px solid var(--line);padding:10px 0}
+details:last-of-type{border-bottom:1px solid var(--line)}
+summary{cursor:pointer;font-weight:700}
+details p{color:var(--sub);font-size:.92rem}
+.links{display:flex;flex-direction:column;gap:6px;margin-top:22px}
+.links a{color:var(--acc);font-weight:700}
+.copy{text-align:center;font-size:.8rem;color:var(--sub);margin:32px 0 0}
+
+.words{display:flex;gap:6px;justify-content:center;margin:4px 0 0;flex-wrap:nowrap}
+.wcol{flex:1 1 0;min-width:0;max-width:110px;text-align:center}
+.wcol .t{font-size:1.05rem;font-weight:700;padding:8px 2px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);word-break:keep-all}
+.wcol.q .t{border-color:var(--acc);border-width:2px}
+.wcol.q.dash .t{border-style:dashed}
+.wcol .sc{font-size:.8rem;color:var(--sub);font-variant-numeric:tabular-nums;min-height:1.4em;margin-top:4px}
+.wcol .pc{font-size:.95rem;font-weight:800;font-variant-numeric:tabular-nums;min-height:1.5em}
+.col{height:84px;display:flex;align-items:flex-end;justify-content:center}
+.col i{display:block;width:60%;background:var(--bar2);border-radius:4px 4px 0 0;min-height:0}
+.wcol.top .col i{background:var(--acc)}
+.arcs{display:block;width:100%;height:46px;margin:0 0 -2px}
+.stepno{font-size:.82rem;color:var(--sub);font-weight:700;margin:0 0 6px}
+
+input[type=range]{width:100%;accent-color:var(--acc)}
+.sl{display:grid;grid-template-columns:4.5em 1fr 2.2em;gap:8px;align-items:center;margin:2px 0}
+.sl span{font-size:.9rem;font-weight:700}.sl output{font-variant-numeric:tabular-nums;text-align:right;font-weight:700}
+.btn{font:inherit;font-weight:700;min-height:44px;padding:8px 14px;border-radius:6px;border:1px solid var(--ink);background:var(--bg);color:var(--ink);cursor:pointer}
+.btn:focus-visible{outline:3px solid var(--warn);outline-offset:3px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th,td{border-bottom:1px solid var(--line);padding:6px 4px;text-align:left;font-variant-numeric:tabular-nums}
+th{color:var(--sub);font-size:.8rem}
+td.n{text-align:right}
+tr.last td{color:var(--sub)}
+.tbl{overflow-x:auto}
+
+.rows{display:grid;gap:6px;margin:6px 0 0}
+.rl{font-size:.82rem;color:var(--sub);font-weight:700;margin:10px 0 2px}
+.g{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:6px}
+.g .w{font-size:1.05rem;font-weight:700;padding:8px 2px;border:1px solid var(--line);border-radius:6px;background:var(--bg);text-align:center;word-break:keep-all}
+.g .w.q{border-color:var(--acc);border-width:2px}
+.g .c{border:1px solid var(--line);border-radius:6px;padding:7px 2px;text-align:center;font-weight:800;font-variant-numeric:tabular-nums;color:var(--ink)}
+.g .c.top{border-color:var(--acc);color:var(--ink)}
+.g .c.off{color:var(--sub);font-weight:400}
+.mixl{font-size:.92rem;margin:4px 0 0}
+.mixl b{font-weight:800}
+.sw{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+.chk{display:flex;align-items:center;gap:8px;min-height:44px;font-weight:700}
+.chk input{width:22px;height:22px;accent-color:var(--acc)}
+.q3{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 10px}
+.big{font-size:2rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
+.chart{display:block;width:100%;height:auto;margin:6px 0 0}
+.chart .ax{stroke:var(--line);stroke-width:1}
+.chart .ln{fill:none;stroke:var(--acc);stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
+.chart .dt{fill:var(--acc)}
+.chart text{fill:var(--sub);font-size:11px;font-family:inherit}
+.note{font-size:.88rem;color:var(--sub);margin:8px 0 0}
+
+.ans{list-style:none;margin:0;padding:0}
+.ans li{padding:8px 0;border-bottom:1px solid var(--line)}
+.ans li:last-child{border-bottom:0}
+.ans .row{display:grid;grid-template-columns:1fr 3em;gap:8px;align-items:baseline}
+.ans .tx{font-size:1rem;font-weight:700;line-height:1.5}
+.ans .ty{font-size:.78rem;color:var(--sub);font-weight:700;margin-left:6px}
+.ans .s{font-variant-numeric:tabular-nums;text-align:right;font-weight:800}
+.ans .b{height:8px;background:var(--line);border-radius:9px;overflow:hidden;margin-top:4px}
+.ans .b i{display:block;height:100%;background:var(--bar2)}
+.ans li.first .b i{background:var(--acc)}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0 0}
+.cmp div{border:1px solid var(--line);border-radius:6px;padding:8px;font-size:.92rem;font-weight:700;background:var(--bg)}
+.cmp div.win{border-color:var(--acc);border-width:2px;background:var(--acc-soft)}
+.cmp small{display:block;font-size:.75rem;color:var(--sub);font-weight:700}
+.rd{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 0}
+.rd label{display:flex;align-items:center;gap:6px;min-height:44px;font-weight:700;border:1px solid var(--line);border-radius:6px;padding:0 12px;background:var(--bg)}
+.rd input{width:20px;height:20px;accent-color:var(--acc)}
+.res{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 0}
+.res span{font-size:.95rem;font-weight:700;padding:6px 10px;border-radius:6px;border:1px solid var(--line);background:var(--bg)}
+.res span.ok{background:var(--acc);border-color:var(--acc);color:var(--on-acc)}
+.res span.ng{border-color:var(--warn);border-style:dashed}
+.res span.idk{color:var(--sub)}
+.tally{font-size:1rem;font-weight:800;margin:10px 0 0}
+
+.mem{display:grid;grid-template-columns:1fr 3.2em;gap:8px;align-items:center;padding:7px 8px;border:1px solid var(--line);border-radius:6px;margin:0 0 6px;background:var(--bg)}
+.mem.pick{border-color:var(--acc);border-width:2px;background:var(--acc-soft)}
+.mem .tx{font-size:.95rem;font-weight:700;line-height:1.45}
+.mem .sm{font-variant-numeric:tabular-nums;text-align:right;font-weight:800;font-size:.95rem}
+.mem .b{grid-column:1/-1;height:6px;background:var(--line);border-radius:9px;overflow:hidden}
+.mem .b i{display:block;height:100%;background:var(--bar2)}
+.mem.pick .b i{background:var(--acc)}
+.prompt{border:1px solid var(--line);border-radius:6px;padding:10px;background:var(--bg);font-size:.95rem;font-weight:700}
+.prompt small{display:block;font-size:.75rem;color:var(--sub);font-weight:700}
+.prompt .sh{color:var(--acc)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:480px){.two{grid-template-columns:1fr}}
+.big2{font-size:1.9rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
+.cmpb{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0 0}
+.cmpb>div{border:1px solid var(--line);border-radius:6px;padding:8px;background:var(--bg);font-weight:700;font-size:.9rem}
+.cmpb>div.win{border-color:var(--acc);border-width:2px;background:var(--acc-soft)}
+.cmpb small{display:block;font-size:.75rem;color:var(--sub);font-weight:700}
+.cmpb .big2{margin-top:2px}
+
+.tiles{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin:6px 0 0}
+.tl{position:relative;border:1px solid var(--line);border-radius:6px;padding:6px 2px 8px;text-align:center;background:var(--bg);color:var(--ink);font-weight:700;font-size:.85rem;min-height:56px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:2px;font-variant-numeric:tabular-nums}
+.tl small{font-size:.7rem;color:var(--sub);font-weight:700;line-height:1.2}
+.tl.in{border-color:var(--acc);background:var(--card)}
+.tl.out{border-style:dashed;color:var(--sub);background:transparent;opacity:.8}
+.tl.key{border-width:2px}
+.tl.key.in{background:var(--acc-soft)}
+.tl.memo{border-color:var(--warn)}
+.tl .wb{position:absolute;left:4px;right:4px;bottom:3px;height:4px;background:var(--line);border-radius:9px;overflow:hidden}
+.tl .wb i{display:block;height:100%;background:var(--acc)}
+.legend2{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.78rem;color:var(--sub);font-weight:700;margin:8px 0 0}
+.legend2 b{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:4px;border:1px solid var(--acc);background:var(--card)}
+.legend2 b.o{border-style:dashed;border-color:var(--sub);background:transparent}
+.legend2 b.k{border-width:2px;background:var(--acc-soft)}
+.share{display:flex;align-items:baseline;gap:10px;margin:0 0 6px}
+.share .big2{min-width:3.2em}
+.share span{font-size:.85rem;color:var(--sub);font-weight:700}
+.pbar{height:10px;background:var(--line);border-radius:9px;overflow:hidden}
+.pbar i{display:block;height:100%;background:var(--acc)}
+.pos{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:3px;align-items:end;height:90px;margin:8px 0 0}
+.pos div{display:flex;align-items:flex-end;justify-content:center;height:100%}
+.pos i{display:block;width:100%;background:var(--bar2);border-radius:3px 3px 0 0}
+.pos div.me i{background:var(--acc)}
+.pos div.cut i{background:transparent;border:1px dashed var(--sub);border-bottom:0}
+.posl{display:flex;justify-content:space-between;font-size:.75rem;color:var(--sub);font-weight:700;margin:2px 0 0}
+</style>
+</head>
+<body>
+<main>
+<p class="tag">チャピのAI講義室｜第32回</p>
+<h1>AIが、会話の最初を忘れるまで</h1>
+<p class="lead">会話の最初に「合言葉」を伝えて、そのあと、会話を続けます。最後にたずねたとき、AIは、合言葉を覚えているでしょうか。会話の長さを選んで、ボタンを押してください。</p>
+
+<button type="button" id="go">合言葉を、10回たずねる</button>
+
+<section class="panel" aria-label="質問と、会話の長さ">
+  <p class="cap">最初に伝えた合言葉</p>
+  <p class="ctx" style="margin:0 0 10px;font-size:1.05rem"><b>「アルネリア共和国の首都は、ベルナです」</b></p>
+  <p class="cap">最後にたずねる質問</p>
+  <p class="ctx" style="margin:0 0 10px;font-size:1.05rem"><b>「アルネリア共和国の首都は？」</b></p>
+  <p class="hint" style="margin:0 0 10px">架空の国です。AIは、この国を練習文で見たことがありません。AIが一度に読める量（窓）は、8かたまりと決めてあります。</p>
+  <p class="cap">会話の長さ</p>
+  <div class="chips" id="chips"></div>
+</section>
+
+<section class="panel" aria-live="polite">
+  <p class="cap">① AIが読める範囲（窓）</p>
+  <div class="tiles" id="tiles"></div>
+  <div class="legend2"><span><b></b>窓の中</span><span><b class="o"></b>窓の外（見えない）</span><span><b class="k"></b>合言葉のかたまり</span></div>
+  <p class="hint" id="winNote"></p>
+</section>
+
+<section class="panel" aria-live="polite">
+  <p class="cap">② 合言葉に、どれだけ注目が向くか</p>
+  <div class="share"><div class="big2" id="wv"></div><span id="wl"></span></div>
+  <div class="pbar"><i id="wbar"></i></div>
+  <p class="hint" id="wNote"></p>
+</section>
+
+<section class="panel" aria-live="polite">
+  <p class="cap">③ 正解が出る確率</p>
+  <div class="cmpb" id="cmp"></div>
+  <p class="verdict" id="verdict"></p>
+</section>
+
+<section class="panel" aria-live="polite">
+  <p class="cap">④ 同じ質問を、10回した結果</p>
+  <div class="res" id="res1"></div>
+  <p class="tally" id="t1" style="margin-top:6px">「合言葉を、10回たずねる」を押してください。</p>
+  <p class="note" id="rnote"></p>
+</section>
+
+<details>
+<summary>何をしているの？</summary>
+<p>AIは、一度に読める量に限りがあります。これを「窓」とか、「コンテキストの長さ」といいます。会話が窓より長くなると、古いほうから、窓の外に出て、見えなくなります。（切り方は、仕組みによって違います。ここでは古いほうから切る場合を見ています。）窓の中に入っていても、読む量が増えるほど、1つのかたまりへの注目は、薄まります。</p>
+</details>
+<details>
+<summary>「注目」は、どう決めているの？</summary>
+<p>第25回のアテンションと同じ考え方です。窓の中のかたまりに点数をつけ、ソフトマックスで、合計が100%になるように分けます。合言葉のかたまりの点数を3、ほかを0と、人が決めました。かたまりが増えるほど、100%の分け合いが増えて、合言葉の持ち分が減ります。</p>
+</details>
+<details>
+<summary>本物の言語AIとは、同じなの？</summary>
+<p>ちがいます。このアプリは、かたまり12個までと、人が決めた説明用の点数だけの、ごく小さな例です。実際の計算結果ではありません。本物の窓は、トークン（第22回）の数で決まり、モデルによって大きく違います。</p>
+</details>
+
+<div class="links">
+  <a href="detail/">くわしく見る（窓の大きさ・合言葉の場所・メモ）</a>
+  <a href="../">アプリ一覧へ</a>
+</div>
+<noscript><p>このアプリを動かすには、JavaScriptをオンにしてください。</p></noscript>
+<p class="copy">© 2026 KOBATO BOOKS</p>
+</main>
+<script>
+var CAND=[{t:"ベルナ",k:"正解（そう決めてある）",b:0},{t:"アルネ市",k:"もっともらしい間違い",b:0.8},{t:"ローマ",k:"もっともらしい間違い",b:0.5},{t:"ウィーン",k:"もっともらしい間違い",b:0.4},{t:"わかりません",k:"分からないと言う",b:-1.0}];
+var REL=3,GAIN=4,BLOCK=100;
+// 会話L個のかたまり。合言葉は p 番目。窓はW個。memo=true なら、大事なことのメモを、最後に1個足す（窓のW個に含む）
+function layout(L,W,p,memo){var blocks=[];for(var i=1;i<=L;i++)blocks.push({n:i,fact:i===p,memo:false});if(memo)blocks.push({n:0,fact:true,memo:true});
+  var vis=Math.max(0,blocks.length-W);blocks.forEach(function(b,i){b.vis=i>=vis;});return blocks;}
+function attn(blocks,C){var v=blocks.filter(function(b){return b.vis;}),n=v.length,s=v.map(function(b,j){var bonus=n>1?C*Math.pow(2*j/(n-1)-1,2):0;return bonus+(b.fact?REL:0);});
+  var m=Math.max.apply(null,s),e=s.map(function(x){return Math.exp(x-m);}),sum=e.reduce(function(a,b){return a+b;},0);
+  var w=0;v.forEach(function(b,j){b.w=e[j]/sum;if(b.fact)w+=b.w;});blocks.forEach(function(b){if(!b.vis)b.w=0;});return {n:n,w:w};}
+function softmax(x){var m=Math.max.apply(null,x),e=x.map(function(v){return Math.exp(v-m);}),s=e.reduce(function(a,b){return a+b;},0);return e.map(function(v){return v/s;});}
+function probs(w,idk){return softmax(CAND.map(function(c,i){var v=c.b;if(i===0)v+=GAIN*w;if(i===4)v+=idk;return v;}));}
+function calc(L,W,p,C,memo){var b=layout(L,W,p,memo),a=attn(b,C);return {blocks:b,n:a.n,w:a.w,pr:probs(a.w,0)};}
+
+var $=function(id){return document.getElementById(id);};
+function pct(x){return Math.round(x*100);}
+function pct1(x){return (Math.round(x*1000)/10).toFixed(1)+"%";}
+function rng(seed){var a=seed>>>0;return function(){a=(a+0x6D2B79F5)>>>0;var t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296;};}
+function ask(pr,k,seed){var r=rng(seed),out=[];for(var j=0;j<k;j++){var u=r(),c=0,i=0;for(;i<pr.length-1;i++){c+=pr[i];if(u<c)break;}out.push(i);}return out;}
+function tally(res){var t=[0,0,0,0,0];res.forEach(function(i){t[i]++;});return {ok:t[0],ng:t[1]+t[2]+t[3],idk:t[4],t:t};}
+function resHTML(el,res){el.innerHTML="";res.slice(0,10).forEach(function(i){var s=document.createElement("span");s.className=i===0?"ok":(i===4?"idk":"ng");s.textContent=CAND[i].t;el.appendChild(s);});}
+function tilesHTML(el,blocks,W){el.innerHTML="";var cols=blocks.length>12?8:6;el.style.gridTemplateColumns="repeat("+cols+",minmax(0,1fr))";
+  blocks.forEach(function(b){var d=document.createElement("div");d.className="tl "+(b.vis?"in":"out")+(b.fact?" key":"")+(b.memo?" memo":"");
+    var t=b.memo?"メモ":(""+b.n);var s=b.memo?"合言葉":(b.fact?"合言葉":"");
+    d.innerHTML="<span></span><small></small>"+(b.vis?'<span class="wb"><i></i></span>':"");d.children[0].textContent=t;d.children[1].textContent=s||(b.vis?"":"外");
+    if(b.vis)d.querySelector(".wb i").style.width=Math.round(b.w*100)+"%";el.appendChild(d);});}
+
+var W=8,LS=[{name:"短い会話（4かたまり）",L:4},{name:"窓いっぱい（8かたまり）",L:8},{name:"窓より長い（12かたまり）",L:12}],si=0,press=0,res=null;
+function render(){
+  var L=LS[si].L,r=calc(L,W,1,0,false),base=probs(0,0);
+  tilesHTML($("tiles"),r.blocks,W);
+  var cut=r.blocks.filter(function(b){return !b.vis;}).length;
+  $("winNote").textContent=cut?("会話は "+L+" かたまり。窓は "+W+" かたまり。古い "+cut+" かたまり（合言葉のかたまり1を含む）が、窓の外に出ています。"):("会話は "+L+" かたまり。窓は "+W+" かたまり。全部、窓の中に入っています。");
+  $("wv").textContent=pct(r.w)+"%";
+  $("wl").textContent=cut?"窓の外なので、注目は、0%":("窓の中の "+r.n+" かたまりで、100%を分け合う");
+  $("wbar").style.width=pct(r.w)+"%";
+  $("wNote").textContent=cut?"見えていないものには、注目できません。AIは、合言葉を知らない状態で答えます。":(r.n<W?"かたまりが少ないので、合言葉に、注目が集まります。":"窓がいっぱいになると、合言葉の持ち分は、少し薄まります。");
+  $("cmp").innerHTML='<div><small>合言葉が見えないとき（正解）</small><div class="big2">'+pct(base[0])+'%</div></div><div class="'+(r.pr[0]>base[0]+0.001?"win":"")+'"><small>この会話の長さ（正解）</small><div class="big2">'+pct(r.pr[0])+'%</div></div>';
+  var top=0;for(var i=1;i<5;i++)if(r.pr[i]>r.pr[top])top=i;
+  $("verdict").textContent="いちばん出やすい答え：「"+CAND[top].t+"」（"+pct(r.pr[top])+"%）";
+  var cs=$("chips").children;for(var k=0;k<cs.length;k++)cs[k].setAttribute("aria-pressed",k===si?"true":"false");
+  if(res){resHTML($("res1"),res);var a=tally(res);$("t1").textContent="10回のうち、正解 "+a.ok+"回、もっともらしい間違い "+a.ng+"回、「わかりません」 "+a.idk+"回";
+    $("rnote").textContent=cut?"合言葉が窓の外に出ると、前回の「調べない」と同じ、当て推量に戻ります。":"合言葉が窓の中にあれば、正解が出やすくなります。会話が長いほど、少し出にくくなります。";
+  } else {$("res1").innerHTML="";$("t1").textContent="「合言葉を、10回たずねる」を押してください。";$("rnote").textContent="";}
+}
+LS.forEach(function(s,i){var b=document.createElement("button");b.type="button";b.className="chip";b.textContent=s.name;b.addEventListener("click",function(){si=i;press=0;res=null;render();});$("chips").appendChild(b);});
+$("go").addEventListener("click",function(){press++;var r=calc(LS[si].L,W,1,0,false);res=ask(r.pr,10,7+press*101+si*13);render();});
+render();
+</script>
+</body>
+</html>
