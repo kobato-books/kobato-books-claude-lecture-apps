@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AIが、道具に頼んで答えるまで（くわしく見る版）｜チャピのAI講義室 第33回</title>
+<meta name="description" content="道具を使いたがる度、依頼文の書き間違い、道具が間違った結果を返すときを変えて、AIが道具に頼んで答えるまでを、くわしく見られます。">
+<!-- OGP（SNSで共有したときの表示） -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="チャピのAI講義室｜KOBATO BOOKS">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:title" content="AIが、道具に頼んで答えるまで｜チャピのAI講義室 第33回">
+<meta property="og:description" content="道具を使いたがる度、依頼文の書き間違い、道具が間違った結果を返すときを変えて、AIが道具に頼んで答えるまでを、くわしく見られます。">
+<meta property="og:url" content="https://lecture.kobatobooks.jp/lecture33/detail/">
+<meta property="og:image" content="https://lecture.kobatobooks.jp/lecture33/detail/ogp.png">
+<meta property="og:image:alt" content="AIが、道具に頼んで答えるまで｜チャピのAI講義室 第33回">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+:root{--bg:#eef2f6;--ink:#1b2a41;--sub:#5b6b80;--card:#fbfcfe;--line:#c7d2df;--acc:#0f7b8a;--acc-soft:#d9eef1;--on-acc:#ffffff;--warn:#a5552a;--bar2:#9aa9bb}
+@media (prefers-color-scheme:dark){:root{--bg:#121a26;--ink:#e6edf6;--sub:#93a3b8;--card:#18212e;--line:#2c394b;--acc:#4cc3d3;--acc-soft:#1d3a42;--on-acc:#0d1b24;--warn:#e39a6f;--bar2:#56667a}}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Hiragino Sans","BIZ UDPGothic","Yu Gothic","Noto Sans JP",system-ui,sans-serif;line-height:1.7;-webkit-text-size-adjust:100%;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+main{max-width:560px;margin:0 auto;padding:24px 16px 56px}
+.tag{font-size:.82rem;color:var(--sub);margin:0 0 4px;font-weight:700}
+h1{font-size:clamp(1.5rem,6.4vw,2rem);line-height:1.35;margin:0 0 6px}
+.lead{color:var(--sub);margin:0 0 18px}
+.cap{display:block;font-size:.8rem;color:var(--sub);font-weight:700;margin:0 0 6px}
+#go{display:block;width:100%;margin:0 0 20px;min-height:60px;font:inherit;font-size:1.2rem;font-weight:800;color:var(--on-acc);background:var(--acc);border:0;border-radius:8px;cursor:pointer}
+#go:active{transform:translateY(2px)}
+#go:focus-visible,a:focus-visible,summary:focus-visible,.chip:focus-visible{outline:3px solid var(--warn);outline-offset:3px}
+#go:disabled{opacity:.7;cursor:default}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px 14px 16px;margin-bottom:14px}
+.prog{display:flex;align-items:baseline;gap:8px;margin:0 0 8px}
+.prog b{font-size:1.6rem;font-variant-numeric:tabular-nums;line-height:1.1}
+.prog span{font-size:.85rem;color:var(--sub);font-weight:700}
+.bar{height:6px;background:var(--line);border-radius:9px;overflow:hidden;margin:0 0 10px}
+.bar i{display:block;height:100%;width:0;background:var(--acc)}
+ol.sents{list-style:none;margin:0;padding:0;columns:2;column-gap:14px;font-size:.92rem}
+@media (max-width:480px){ol.sents{columns:1}}
+ol.sents li{padding:1px 6px;border-radius:4px;color:var(--sub);break-inside:avoid;border-left:3px solid transparent}
+ol.sents li.done{color:var(--ink)}
+ol.sents li.hit{background:var(--acc-soft);border-left-color:var(--acc);color:var(--ink);font-weight:700}
+ol.sents li.now{background:var(--acc-soft);border-left-color:var(--acc);color:var(--ink);font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:1.1rem;padding:8px 14px;min-height:44px;border:1px solid var(--ink);border-radius:6px;background:var(--bg);color:var(--ink);cursor:pointer}
+.chip[aria-pressed=true]{background:var(--acc);border-color:var(--acc);color:var(--on-acc);font-weight:800}
+.chip:disabled{opacity:.45;cursor:default}
+.hint{font-size:.85rem;color:var(--sub);margin:10px 0 0}
+.rank{margin:0;padding:0;list-style:none}
+.rank li{display:grid;grid-template-columns:3.2em 1fr 3em;align-items:center;column-gap:8px;row-gap:3px;padding:6px 0;border-bottom:1px solid var(--line)}
+.rank li:last-child{border-bottom:0}
+.rank .no{font-size:.85rem;color:var(--sub);font-weight:700}
+.rank .w{font-size:1.1rem;font-weight:700;line-height:1.4}
+.rank .b{grid-column:1/-1;height:8px;background:var(--line);border-radius:9px;overflow:hidden}
+.rank .b i{display:block;height:100%;background:var(--bar2)}
+.rank li.first .b i{background:var(--acc)}
+.rank .s{font-variant-numeric:tabular-nums;text-align:right;font-weight:700}
+.ctx{font-size:.92rem;margin:10px 0 0;color:var(--ink)}
+.ctx b{font-weight:800}
+.flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:4px;text-align:center;font-size:.85rem;font-weight:700;margin:6px 0 2px}
+.flow div{border:1px solid var(--line);border-radius:6px;padding:8px 4px;background:var(--card)}
+.flow .hi{border-color:var(--acc);background:var(--acc-soft)}
+.flow i{font-style:normal;color:var(--sub)}
+.pre{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 4px}
+.tile{font-size:1.15rem;font-weight:700;padding:8px 12px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--sub)}
+.tile.on{background:var(--acc);border-color:var(--acc);color:var(--on-acc)}
+.tile.q{background:transparent;border-style:dashed;color:var(--ink)}
+.verdict{font-weight:800;margin:10px 0 0}
+.legend{font-size:.82rem;color:var(--sub);margin:6px 0 0}
+details{border-top:1px solid var(--line);padding:10px 0}
+details:last-of-type{border-bottom:1px solid var(--line)}
+summary{cursor:pointer;font-weight:700}
+details p{color:var(--sub);font-size:.92rem}
+.links{display:flex;flex-direction:column;gap:6px;margin-top:22px}
+.links a{color:var(--acc);font-weight:700}
+.copy{text-align:center;font-size:.8rem;color:var(--sub);margin:32px 0 0}
+
+.words{display:flex;gap:6px;justify-content:center;margin:4px 0 0;flex-wrap:nowrap}
+.wcol{flex:1 1 0;min-width:0;max-width:110px;text-align:center}
+.wcol .t{font-size:1.05rem;font-weight:700;padding:8px 2px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);word-break:keep-all}
+.wcol.q .t{border-color:var(--acc);border-width:2px}
+.wcol.q.dash .t{border-style:dashed}
+.wcol .sc{font-size:.8rem;color:var(--sub);font-variant-numeric:tabular-nums;min-height:1.4em;margin-top:4px}
+.wcol .pc{font-size:.95rem;font-weight:800;font-variant-numeric:tabular-nums;min-height:1.5em}
+.col{height:84px;display:flex;align-items:flex-end;justify-content:center}
+.col i{display:block;width:60%;background:var(--bar2);border-radius:4px 4px 0 0;min-height:0}
+.wcol.top .col i{background:var(--acc)}
+.arcs{display:block;width:100%;height:46px;margin:0 0 -2px}
+.stepno{font-size:.82rem;color:var(--sub);font-weight:700;margin:0 0 6px}
+
+input[type=range]{width:100%;accent-color:var(--acc)}
+.sl{display:grid;grid-template-columns:4.5em 1fr 2.2em;gap:8px;align-items:center;margin:2px 0}
+.sl span{font-size:.9rem;font-weight:700}.sl output{font-variant-numeric:tabular-nums;text-align:right;font-weight:700}
+.btn{font:inherit;font-weight:700;min-height:44px;padding:8px 14px;border-radius:6px;border:1px solid var(--ink);background:var(--bg);color:var(--ink);cursor:pointer}
+.btn:focus-visible{outline:3px solid var(--warn);outline-offset:3px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th,td{border-bottom:1px solid var(--line);padding:6px 4px;text-align:left;font-variant-numeric:tabular-nums}
+th{color:var(--sub);font-size:.8rem}
+td.n{text-align:right}
+tr.last td{color:var(--sub)}
+.tbl{overflow-x:auto}
+
+.rows{display:grid;gap:6px;margin:6px 0 0}
+.rl{font-size:.82rem;color:var(--sub);font-weight:700;margin:10px 0 2px}
+.g{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:6px}
+.g .w{font-size:1.05rem;font-weight:700;padding:8px 2px;border:1px solid var(--line);border-radius:6px;background:var(--bg);text-align:center;word-break:keep-all}
+.g .w.q{border-color:var(--acc);border-width:2px}
+.g .c{border:1px solid var(--line);border-radius:6px;padding:7px 2px;text-align:center;font-weight:800;font-variant-numeric:tabular-nums;color:var(--ink)}
+.g .c.top{border-color:var(--acc);color:var(--ink)}
+.g .c.off{color:var(--sub);font-weight:400}
+.mixl{font-size:.92rem;margin:4px 0 0}
+.mixl b{font-weight:800}
+.sw{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+.chk{display:flex;align-items:center;gap:8px;min-height:44px;font-weight:700}
+.chk input{width:22px;height:22px;accent-color:var(--acc)}
+.q3{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 10px}
+.big{font-size:2rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
+.chart{display:block;width:100%;height:auto;margin:6px 0 0}
+.chart .ax{stroke:var(--line);stroke-width:1}
+.chart .ln{fill:none;stroke:var(--acc);stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
+.chart .dt{fill:var(--acc)}
+.chart text{fill:var(--sub);font-size:11px;font-family:inherit}
+.note{font-size:.88rem;color:var(--sub);margin:8px 0 0}
+
+.ans{list-style:none;margin:0;padding:0}
+.ans li{padding:8px 0;border-bottom:1px solid var(--line)}
+.ans li:last-child{border-bottom:0}
+.ans .row{display:grid;grid-template-columns:1fr 3em;gap:8px;align-items:baseline}
+.ans .tx{font-size:1rem;font-weight:700;line-height:1.5}
+.ans .ty{font-size:.78rem;color:var(--sub);font-weight:700;margin-left:6px}
+.ans .s{font-variant-numeric:tabular-nums;text-align:right;font-weight:800}
+.ans .b{height:8px;background:var(--line);border-radius:9px;overflow:hidden;margin-top:4px}
+.ans .b i{display:block;height:100%;background:var(--bar2)}
+.ans li.first .b i{background:var(--acc)}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0 0}
+.cmp div{border:1px solid var(--line);border-radius:6px;padding:8px;font-size:.92rem;font-weight:700;background:var(--bg)}
+.cmp div.win{border-color:var(--acc);border-width:2px;background:var(--acc-soft)}
+.cmp small{display:block;font-size:.75rem;color:var(--sub);font-weight:700}
+.rd{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 0}
+.rd label{display:flex;align-items:center;gap:6px;min-height:44px;font-weight:700;border:1px solid var(--line);border-radius:6px;padding:0 12px;background:var(--bg)}
+.rd input{width:20px;height:20px;accent-color:var(--acc)}
+.res{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 0}
+.res span{font-size:.95rem;font-weight:700;padding:6px 10px;border-radius:6px;border:1px solid var(--line);background:var(--bg)}
+.res span.ok{background:var(--acc);border-color:var(--acc);color:var(--on-acc)}
+.res span.ng{border-color:var(--warn);border-style:dashed}
+.res span.idk{color:var(--sub)}
+.tally{font-size:1rem;font-weight:800;margin:10px 0 0}
+
+.mem{display:grid;grid-template-columns:1fr 3.2em;gap:8px;align-items:center;padding:7px 8px;border:1px solid var(--line);border-radius:6px;margin:0 0 6px;background:var(--bg)}
+.mem.pick{border-color:var(--acc);border-width:2px;background:var(--acc-soft)}
+.mem .tx{font-size:.95rem;font-weight:700;line-height:1.45}
+.mem .sm{font-variant-numeric:tabular-nums;text-align:right;font-weight:800;font-size:.95rem}
+.mem .b{grid-column:1/-1;height:6px;background:var(--line);border-radius:9px;overflow:hidden}
+.mem .b i{display:block;height:100%;background:var(--bar2)}
+.mem.pick .b i{background:var(--acc)}
+.prompt{border:1px solid var(--line);border-radius:6px;padding:10px;background:var(--bg);font-size:.95rem;font-weight:700}
+.prompt small{display:block;font-size:.75rem;color:var(--sub);font-weight:700}
+.prompt .sh{color:var(--acc)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:480px){.two{grid-template-columns:1fr}}
+.big2{font-size:1.9rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
+.cmpb{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0 0}
+.cmpb>div{border:1px solid var(--line);border-radius:6px;padding:8px;background:var(--bg);font-weight:700;font-size:.9rem}
+.cmpb>div.win{border-color:var(--acc);border-width:2px;background:var(--acc-soft)}
+.cmpb small{display:block;font-size:.75rem;color:var(--sub);font-weight:700}
+.cmpb .big2{margin-top:2px}
+
+.tiles{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin:6px 0 0}
+.tl{position:relative;border:1px solid var(--line);border-radius:6px;padding:6px 2px 8px;text-align:center;background:var(--bg);color:var(--ink);font-weight:700;font-size:.85rem;min-height:56px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:2px;font-variant-numeric:tabular-nums}
+.tl small{font-size:.7rem;color:var(--sub);font-weight:700;line-height:1.2}
+.tl.in{border-color:var(--acc);background:var(--card)}
+.tl.out{border-style:dashed;color:var(--sub);background:transparent;opacity:.8}
+.tl.key{border-width:2px}
+.tl.key.in{background:var(--acc-soft)}
+.tl.memo{border-color:var(--warn)}
+.tl .wb{position:absolute;left:4px;right:4px;bottom:3px;height:4px;background:var(--line);border-radius:9px;overflow:hidden}
+.tl .wb i{display:block;height:100%;background:var(--acc)}
+.legend2{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.78rem;color:var(--sub);font-weight:700;margin:8px 0 0}
+.legend2 b{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:4px;border:1px solid var(--acc);background:var(--card)}
+.legend2 b.o{border-style:dashed;border-color:var(--sub);background:transparent}
+.legend2 b.k{border-width:2px;background:var(--acc-soft)}
+.share{display:flex;align-items:baseline;gap:10px;margin:0 0 6px}
+.share .big2{min-width:3.2em}
+.share span{font-size:.85rem;color:var(--sub);font-weight:700}
+.pbar{height:10px;background:var(--line);border-radius:9px;overflow:hidden}
+.pbar i{display:block;height:100%;background:var(--acc)}
+.pos{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:3px;align-items:end;height:90px;margin:8px 0 0}
+.pos div{display:flex;align-items:flex-end;justify-content:center;height:100%}
+.pos i{display:block;width:100%;background:var(--bar2);border-radius:3px 3px 0 0}
+.pos div.me i{background:var(--acc)}
+.pos div.cut i{background:transparent;border:1px dashed var(--sub);border-bottom:0}
+.posl{display:flex;justify-content:space-between;font-size:.75rem;color:var(--sub);font-weight:700;margin:2px 0 0}
+.acts{list-style:none;margin:0;padding:0}
+.acts li{padding:8px 0;border-bottom:1px solid var(--line)}
+.acts li:last-child{border-bottom:0}
+.acts .row{display:grid;grid-template-columns:1fr 3.2em;gap:8px;align-items:baseline}
+.acts .tx{font-weight:700}
+.acts .s{font-variant-numeric:tabular-nums;text-align:right;font-weight:800}
+.acts .b{height:8px;background:var(--line);border-radius:9px;overflow:hidden;margin-top:4px}
+.acts .b i{display:block;height:100%;background:var(--bar2)}
+.acts li.first .b i{background:var(--acc)}
+.steps{display:grid;gap:8px;margin:6px 0 0}
+.stp{border:1px solid var(--line);border-radius:6px;padding:8px 10px;background:var(--bg)}
+.stp small{display:block;font-size:.75rem;color:var(--sub);font-weight:700}
+.stp b{font-weight:800;word-break:break-all}
+.stp.hi{border-color:var(--acc);border-width:2px;background:var(--acc-soft)}
+.stp.off{border-style:dashed;color:var(--sub)}
+.mono{font-family:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace}
+.res span.tl2{font-weight:400;font-size:.8rem;color:var(--sub);margin-right:4px}
+.sl2{display:grid;grid-template-columns:7.5em 1fr 3em;gap:8px;align-items:center;margin:4px 0}
+.sl2 span{font-size:.85rem;font-weight:700}.sl2 output{font-variant-numeric:tabular-nums;text-align:right;font-weight:700}
+
+</style>
+</head>
+<body>
+<main>
+<p class="tag">チャピのAI講義室｜第33回｜くわしく見る版</p>
+<h1>AIが、道具に頼んで答えるまで</h1>
+<p class="lead">かんたん版に、3つの仕掛けを足しました。道具を使いたがる度、依頼文の書き間違い、道具が間違った結果を返すとき。動かして、正解が出る確率が、どう変わるかを見てください。</p>
+
+<button type="button" id="go">同じ質問を、たずねる</button>
+
+<section class="panel" aria-label="質問と仕掛け">
+  <p class="cap">AIにたずねる質問</p>
+  <div class="chips" id="chips"></div>
+  <p class="hint" id="qnote"></p>
+  <p class="cap" style="margin-top:12px">仕掛け</p>
+  <div class="sl2"><span>道具を使いたがる度</span><input type="range" id="sT" min="0" max="3" step="0.5" value="0" aria-label="道具を使いたがる度"><output id="oT">0</output></div>
+  <div class="sl2"><span>依頼文の書き間違い</span><input type="range" id="sF" min="0" max="30" step="5" value="0" aria-label="依頼文の書き間違い（パーセント）"><output id="oF">0%</output></div>
+  <div class="sw"><label class="chk"><input type="checkbox" id="cBad">道具が、間違った結果を返す</label></div>
+  <p class="cap" style="margin-top:10px">たずねる回数</p>
+  <div class="rd"><label><input type="radio" name="n" value="10" checked>10回</label><label><input type="radio" name="n" value="100">100回</label></div>
+</section>
+
+<section class="panel" aria-live="polite">
+  <p class="cap">① AIが、どうするかを決める</p>
+  <ul class="acts" id="acts"></ul>
+  <p class="hint" id="aNote"></p>
+</section>
+
+<section class="panel" aria-live="polite">
+  <p class="cap">② いちばん出やすい行動を、取ったとき</p>
+  <div class="steps" id="steps"></div>
+</section>
+
+<section class="panel" aria-live="polite">
+  <p class="cap">③ 正解が出る確率と、道具を呼ぶ割合</p>
+  <div class="cmpb" id="cmp"></div>
+  <p class="verdict" id="verdict"></p>
+</section>
+
+<section class="panel" aria-live="polite">
+  <p class="cap">④ 同じ質問をした結果</p>
+  <div class="res" id="res1"></div>
+  <p class="tally" id="t1" style="margin-top:6px">「同じ質問を、たずねる」を押してください。</p>
+  <p class="note" id="rnote"></p>
+</section>
+
+<details>
+<summary>3つの仕掛けは、何をしているの？</summary>
+<p>道具を使いたがる度は、電卓と検索の点数に、同じ数を足します。大きくすると、道具が要らない質問でも、道具を呼びがちになります。依頼文の書き間違いは、AIが書いた依頼文の形が壊れて、道具が動かない割合です。道具が間違った結果を返すスイッチを入れると、AIは、その間違った結果を、そのまま読んで答えます。AIには、結果が正しいかを、確かめる手段がありません。</p>
+</details>
+<details>
+<summary>数字は、本物ですか？</summary>
+<p>このアプリは、質問3つと、人が決めた説明用の点数だけの、ごく小さな例です。実際の計算結果ではありません。</p>
+</details>
+
+<div class="links">
+  <a href="../">かんたん版へ</a>
+  <a href="../../">アプリ一覧へ</a>
+</div>
+<noscript><p>このアプリを動かすには、JavaScriptをオンにしてください。</p></noscript>
+<p class="copy">© 2026 KOBATO BOOKS</p>
+</main>
+<script>
+var QS=[
+{name:"計算：347×28は？",q:"347 × 28 は？",cands:["9716","9616","9816","9696","わかりません"],b:[0.6,0.8,0.5,0.4,-1.0],act:[0.5,3.0,0.0],use:1,call:"電卓(347 × 28)",res:"9716",fact:"計算が要る質問"},
+{name:"最新情報：アルネリアの今日の天気は？",q:"アルネリア共和国の、今日の天気は？",cands:["くもり","晴れ","雨","雪","わかりません"],b:[0.0,0.8,0.5,0.0,-0.5],act:[0.8,-2.0,3.0],use:2,call:"検索(アルネリア共和国 今日の天気)",res:"くもり、12度",fact:"今日の情報が要る質問"},
+{name:"常識：日本の首都は？",q:"日本の首都は？",cands:["東京","京都","大阪","横浜","わかりません"],b:[4.0,1.0,0.5,0.0,-1.5],act:[3.0,-2.0,0.5],use:2,call:"検索(日本 首都)",res:"東京",fact:"もともと知っている質問"}];
+var AN=["直接答える","電卓に頼む","検索に頼む"],GAIN=5;
+function softmax(x){var m=Math.max.apply(null,x),e=x.map(function(v){return Math.exp(v-m);}),s=e.reduce(function(a,b){return a+b;},0);return e.map(function(v){return v/s;});}
+function calc(qi,T,F,bad){var Q=QS[qi];
+ var pa=softmax(Q.act.map(function(s,i){return i>0?s+T:s;}));
+ var base=softmax(Q.b);
+ var tb=Q.b.slice();tb[bad?1:0]+=GAIN;var pt=softmax(tb);
+ var pc=0;for(var a=0;a<3;a++){if(a===0||a!==Q.use)pc+=pa[a]*base[0];else pc+=pa[a]*((1-F)*pt[0]+F*base[0]);}
+ var calls=pa[1]+pa[2];
+ return {pa:pa,base:base,pt:pt,pc:pc,calls:calls};}
+
+var $=function(id){return document.getElementById(id);};
+function pct(x){return Math.round(x*100);}
+function pct1(x){return (Math.round(x*1000)/10).toFixed(1)+"%";}
+function rng(seed){var a=seed>>>0;return function(){a=(a+0x6D2B79F5)>>>0;var t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296;};}
+function pick(pr,u){var c=0,i=0;for(;i<pr.length-1;i++){c+=pr[i];if(u<c)break;}return i;}
+// 1回の質問：道具を選ぶ→（役に立つ道具で、依頼文が正しければ）結果を足す→答える
+function trial(qi,T,F,bad,r){var Q=QS[qi],c=calc(qi,T,F,bad),a=pick(c.pa,r()),ok=true,used=false,pr=c.base;
+  if(a>0)used=true;
+  if(a>0&&a===Q.use){ok=r()>=F;if(ok)pr=c.pt;else r();}else r();
+  var ans=pick(pr,r());return {a:a,used:used,malformed:(a>0&&a===Q.use&&!ok),ans:ans,right:ans===0};}
+function runN(qi,T,F,bad,n,seed){var r=rng(seed),out=[];for(var j=0;j<n;j++)out.push(trial(qi,T,F,bad,r));return out;}
+function chipText(t,Q){var l=t.a===0?"直接":(t.a===1?"電卓":"検索");return l+"→"+Q.cands[t.ans];}
+function actsHTML(el,pa){el.innerHTML="";var top=0;pa.forEach(function(p,i){if(p>pa[top])top=i;});
+  pa.forEach(function(p,i){var li=document.createElement("li");if(i===top)li.className="first";li.innerHTML='<div class="row"><span class="tx"></span><span class="s"></span></div><div class="b"><i></i></div>';
+    li.querySelector(".tx").textContent=AN[i];li.querySelector(".s").textContent=pct(p)+"%";li.querySelector(".b i").style.width=pct(p)+"%";el.appendChild(li);});return top;}
+function stepsHTML(el,Q,top,bad,F){el.innerHTML="";
+  function add(cls,sm,tx){var d=document.createElement("div");d.className="stp "+cls;d.innerHTML="<small></small><b></b>";d.children[0].textContent=sm;d.children[1].textContent=tx;el.appendChild(d);}
+  if(top===0){add("off","AIは、道具を呼ばない","「"+Q.q+"」に、自分の知っていることだけで答えます。");return;}
+  var right=(top===Q.use);var call=top===1?(right?Q.call:"電卓("+Q.q.replace(/[^0-9 ×]/g,"")+")"):(right?Q.call:"検索("+Q.q.replace(/[？]/g,"")+")");
+  add("hi","① AIが書く依頼文（ただの文字の並び）",call);
+  if(right){var rs=bad?(Q.use===1?"9616（道具が間違っている）":"雨、3度（道具が間違っている）"):Q.res;
+    add("","② 道具を動かすのは、AIではなく、周りのシステム","結果：  "+rs);
+    add("","③ 結果を、会話に足してから、AIが答える","「"+Q.q+"」＋ 道具の結果「"+rs+"」");
+  } else {add("off","② 道具を動かす","この質問には、役に立たない道具です。結果は、答えの助けになりません。");add("","③ AIが答える","道具が役に立たないので、直接答えるのと、ほぼ同じです。");}
+  if(right&&F>0)add("off","書き間違い","依頼文の形が壊れると（"+Math.round(F*100)+"%）、道具は動かず、結果は足されません。");}
+
+var qi=0,press=0,res=null,T=0,F=0,bad=false,NN=10;
+function nsel(){var r=document.getElementsByName("n");for(var i=0;i<r.length;i++)if(r[i].checked)return +r[i].value;return 10;}
+function render(){var Q=QS[qi],c=calc(qi,T,F,bad);
+  $("qnote").textContent="この質問は、「"+Q.fact+"」です。"+(qi===1?"アルネリア共和国は、架空の国です。":"");
+  var top=actsHTML($("acts"),c.pa);
+  $("aNote").textContent="道具を呼ぶ割合：電卓と検索の合計で "+pct(c.calls)+"%。"+(T>0?"（道具を使いたがる度 "+T+" を足した結果です。）":"");
+  stepsHTML($("steps"),Q,top,bad,F);
+  var noTool=c.base[0];
+  $("cmp").innerHTML='<div><small>いつも直接答えるとき（正解）</small><div class="big2">'+pct1(noTool)+'</div></div><div class="'+(c.pc>noTool+0.001?"win":"")+'"><small>AIが選んで道具を使うとき（正解）</small><div class="big2">'+pct1(c.pc)+'</div></div>';
+  $("verdict").textContent=c.pc>noTool+0.05?"道具に頼むと、正解が出やすくなります。":(c.pc<noTool-0.05?"道具のせいで、かえって、正解が出にくくなっています。":"この設定では、正解の出やすさは、ほぼ変わりません。");
+  var cs=$("chips").children;for(var k=0;k<cs.length;k++)cs[k].setAttribute("aria-pressed",k===qi?"true":"false");
+  $("oT").textContent=T;$("oF").textContent=Math.round(F*100)+"%";
+  if(res){var el=$("res1");el.innerHTML="";var n=res.length;
+    if(n<=10){res.forEach(function(t){var s=document.createElement("span");s.className=t.right?"ok":(t.ans===4?"idk":"ng");s.textContent=chipText(t,Q);el.appendChild(s);});}
+    var ok=res.filter(function(t){return t.right;}).length,used=res.filter(function(t){return t.used;}).length,mal=res.filter(function(t){return t.malformed;}).length;
+    $("t1").textContent=n+"回のうち、正解 "+ok+"回、道具を呼んだ回数 "+used+"回、依頼文が壊れた回数 "+mal+"回";
+    $("rnote").textContent=n>10?"回数を増やすと、結果は、上の確率に近づきます。":"10回だと、確率からずれることがあります。100回にすると、近づきます。";
+  } else {$("res1").innerHTML="";$("t1").textContent="「同じ質問を、たずねる」を押してください。";$("rnote").textContent="";}
+}
+QS.forEach(function(s,i){var b=document.createElement("button");b.type="button";b.className="chip";b.textContent=s.name;b.addEventListener("click",function(){qi=i;press=0;res=null;render();});$("chips").appendChild(b);});
+$("sT").addEventListener("input",function(){T=+this.value;res=null;render();});
+$("sF").addEventListener("input",function(){F=+this.value/100;res=null;render();});
+$("cBad").addEventListener("change",function(){bad=this.checked;res=null;render();});
+var rs=document.getElementsByName("n");for(var i=0;i<rs.length;i++)rs[i].addEventListener("change",function(){res=null;render();});
+$("go").addEventListener("click",function(){press++;res=runN(qi,T,F,bad,nsel(),11+press*103+qi*17);render();});
+render();
+</script>
+</body>
+</html>
