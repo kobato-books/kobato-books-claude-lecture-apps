@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AIが、やり直しながら、仕事を終えるまで（くわしく見る版）｜チャピのAI講義室 第34回</title>
+<meta name="description" content="気づく力、上限回数、道具の失敗率、念のためのやり直しを動かして、エージェントの正解率・時間切れ・道具を呼ぶ回数がどう変わるかを見られます。">
+<!-- OGP（SNSで共有したときの表示） -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="チャピのAI講義室｜KOBATO BOOKS">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:title" content="AIが、やり直しながら、仕事を終えるまで（くわしく見る版）｜チャピのAI講義室 第34回">
+<meta property="og:description" content="気づく力、上限回数、道具の失敗率、念のためのやり直しを動かして、エージェントの正解率・時間切れ・道具を呼ぶ回数がどう変わるかを見られます。">
+<meta property="og:url" content="https://lecture.kobatobooks.jp/lecture34/detail/">
+<meta property="og:image" content="https://lecture.kobatobooks.jp/lecture34/detail/ogp.png">
+<meta property="og:image:alt" content="AIが、やり直しながら、仕事を終えるまで（くわしく見る版）｜チャピのAI講義室 第34回">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+:root{--bg:#eef2f6;--ink:#1b2a41;--sub:#5b6b80;--card:#fbfcfe;--line:#c7d2df;--acc:#0f7b8a;--acc-soft:#d9eef1;--on-acc:#ffffff;--warn:#a5552a;--bar2:#9aa9bb}
+@media (prefers-color-scheme:dark){:root{--bg:#121a26;--ink:#e6edf6;--sub:#93a3b8;--card:#18212e;--line:#2c394b;--acc:#4cc3d3;--acc-soft:#1d3a42;--on-acc:#0d1b24;--warn:#e39a6f;--bar2:#56667a}}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Hiragino Sans","BIZ UDPGothic","Yu Gothic","Noto Sans JP",system-ui,sans-serif;line-height:1.7;-webkit-text-size-adjust:100%;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+main{max-width:560px;margin:0 auto;padding:24px 16px 56px}
+.tag{font-size:.82rem;color:var(--sub);margin:0 0 4px;font-weight:700}
+h1{font-size:clamp(1.5rem,6.4vw,2rem);line-height:1.35;margin:0 0 6px}
+.lead{color:var(--sub);margin:0 0 18px}
+.cap{display:block;font-size:.8rem;color:var(--sub);font-weight:700;margin:0 0 6px}
+#go{display:block;width:100%;margin:0 0 20px;min-height:60px;font:inherit;font-size:1.2rem;font-weight:800;color:var(--on-acc);background:var(--acc);border:0;border-radius:8px;cursor:pointer}
+#go:active{transform:translateY(2px)}
+#go:focus-visible,a:focus-visible,summary:focus-visible,.chip:focus-visible{outline:3px solid var(--warn);outline-offset:3px}
+#go:disabled{opacity:.7;cursor:default}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px 14px 16px;margin-bottom:14px}
+.prog{display:flex;align-items:baseline;gap:8px;margin:0 0 8px}
+.prog b{font-size:1.6rem;font-variant-numeric:tabular-nums;line-height:1.1}
+.prog span{font-size:.85rem;color:var(--sub);font-weight:700}
+.bar{height:6px;background:var(--line);border-radius:9px;overflow:hidden;margin:0 0 10px}
+.bar i{display:block;height:100%;width:0;background:var(--acc)}
+ol.sents{list-style:none;margin:0;padding:0;columns:2;column-gap:14px;font-size:.92rem}
+@media (max-width:480px){ol.sents{columns:1}}
+ol.sents li{padding:1px 6px;border-radius:4px;color:var(--sub);break-inside:avoid;border-left:3px solid transparent}
+ol.sents li.done{color:var(--ink)}
+ol.sents li.hit{background:var(--acc-soft);border-left-color:var(--acc);color:var(--ink);font-weight:700}
+ol.sents li.now{background:var(--acc-soft);border-left-color:var(--acc);color:var(--ink);font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:1.1rem;padding:8px 14px;min-height:44px;border:1px solid var(--ink);border-radius:6px;background:var(--bg);color:var(--ink);cursor:pointer}
+.chip[aria-pressed=true]{background:var(--acc);border-color:var(--acc);color:var(--on-acc);font-weight:800}
+.chip:disabled{opacity:.45;cursor:default}
+.hint{font-size:.85rem;color:var(--sub);margin:10px 0 0}
+.rank{margin:0;padding:0;list-style:none}
+.rank li{display:grid;grid-template-columns:3.2em 1fr 3em;align-items:center;column-gap:8px;row-gap:3px;padding:6px 0;border-bottom:1px solid var(--line)}
+.rank li:last-child{border-bottom:0}
+.rank .no{font-size:.85rem;color:var(--sub);font-weight:700}
+.rank .w{font-size:1.1rem;font-weight:700;line-height:1.4}
+.rank .b{grid-column:1/-1;height:8px;background:var(--line);border-radius:9px;overflow:hidden}
+.rank .b i{display:block;height:100%;background:var(--bar2)}
+.rank li.first .b i{background:var(--acc)}
+.rank .s{font-variant-numeric:tabular-nums;text-align:right;font-weight:700}
+.ctx{font-size:.92rem;margin:10px 0 0;color:var(--ink)}
+.ctx b{font-weight:800}
+.flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:4px;text-align:center;font-size:.85rem;font-weight:700;margin:6px 0 2px}
+.flow div{border:1px solid var(--line);border-radius:6px;padding:8px 4px;background:var(--card)}
+.flow .hi{border-color:var(--acc);background:var(--acc-soft)}
+.flow i{font-style:normal;color:var(--sub)}
+.pre{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 4px}
+.tile{font-size:1.15rem;font-weight:700;padding:8px 12px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--sub)}
+.tile.on{background:var(--acc);border-color:var(--acc);color:var(--on-acc)}
+.tile.q{background:transparent;border-style:dashed;color:var(--ink)}
+.verdict{font-weight:800;margin:10px 0 0}
+.legend{font-size:.82rem;color:var(--sub);margin:6px 0 0}
+details{border-top:1px solid var(--line);padding:10px 0}
+details:last-of-type{border-bottom:1px solid var(--line)}
+summary{cursor:pointer;font-weight:700}
+details p{color:var(--sub);font-size:.92rem}
+.links{display:flex;flex-direction:column;gap:6px;margin-top:22px}
+.links a{color:var(--acc);font-weight:700}
+.copy{text-align:center;font-size:.8rem;color:var(--sub);margin:32px 0 0}
+
+.words{display:flex;gap:6px;justify-content:center;margin:4px 0 0;flex-wrap:nowrap}
+.wcol{flex:1 1 0;min-width:0;max-width:110px;text-align:center}
+.wcol .t{font-size:1.05rem;font-weight:700;padding:8px 2px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);word-break:keep-all}
+.wcol.q .t{border-color:var(--acc);border-width:2px}
+.wcol.q.dash .t{border-style:dashed}
+.wcol .sc{font-size:.8rem;color:var(--sub);font-variant-numeric:tabular-nums;min-height:1.4em;margin-top:4px}
+.wcol .pc{font-size:.95rem;font-weight:800;font-variant-numeric:tabular-nums;min-height:1.5em}
+.col{height:84px;display:flex;align-items:flex-end;justify-content:center}
+.col i{display:block;width:60%;background:var(--bar2);border-radius:4px 4px 0 0;min-height:0}
+.wcol.top .col i{background:var(--acc)}
+.arcs{display:block;width:100%;height:46px;margin:0 0 -2px}
+.stepno{font-size:.82rem;color:var(--sub);font-weight:700;margin:0 0 6px}
+
+input[type=range]{width:100%;accent-color:var(--acc)}
+.sl{display:grid;grid-template-columns:4.5em 1fr 2.2em;gap:8px;align-items:center;margin:2px 0}
+.sl span{font-size:.9rem;font-weight:700}.sl output{font-variant-numeric:tabular-nums;text-align:right;font-weight:700}
+.btn{font:inherit;font-weight:700;min-height:44px;padding:8px 14px;border-radius:6px;border:1px solid var(--ink);background:var(--bg);color:var(--ink);cursor:pointer}
+.btn:focus-visible{outline:3px solid var(--warn);outline-offset:3px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th,td{border-bottom:1px solid var(--line);padding:6px 4px;text-align:left;font-variant-numeric:tabular-nums}
+th{color:var(--sub);font-size:.8rem}
+td.n{text-align:right}
+tr.last td{color:var(--sub)}
+.tbl{overflow-x:auto}
+
+.rows{display:grid;gap:6px;margin:6px 0 0}
+.rl{font-size:.82rem;color:var(--sub);font-weight:700;margin:10px 0 2px}
+.g{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:6px}
+.g .w{font-size:1.05rem;font-weight:700;padding:8px 2px;border:1px solid var(--line);border-radius:6px;background:var(--bg);text-align:center;word-break:keep-all}
+.g .w.q{border-color:var(--acc);border-width:2px}
+.g .c{border:1px solid var(--line);border-radius:6px;padding:7px 2px;text-align:center;font-weight:800;font-variant-numeric:tabular-nums;color:var(--ink)}
+.g .c.top{border-color:var(--acc);color:var(--ink)}
+.g .c.off{color:var(--sub);font-weight:400}
+.mixl{font-size:.92rem;margin:4px 0 0}
+.mixl b{font-weight:800}
+.sw{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+.chk{display:flex;align-items:center;gap:8px;min-height:44px;font-weight:700}
+.chk input{width:22px;height:22px;accent-color:var(--acc)}
+.q3{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 10px}
+.big{font-size:2rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
+.chart{display:block;width:100%;height:auto;margin:6px 0 0}
+.chart .ax{stroke:var(--line);stroke-width:1}
+.chart .ln{fill:none;stroke:var(--acc);stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
+.chart .dt{fill:var(--acc)}
+.chart text{fill:var(--sub);font-size:11px;font-family:inherit}
+.note{font-size:.88rem;color:var(--sub);margin:8px 0 0}
+
+.ans{list-style:none;margin:0;padding:0}
+.ans li{padding:8px 0;border-bottom:1px solid var(--line)}
+.ans li:last-child{border-bottom:0}
+.ans .row{display:grid;grid-template-columns:1fr 3em;gap:8px;align-items:baseline}
+.ans .tx{font-size:1rem;font-weight:700;line-height:1.5}
+.ans .ty{font-size:.78rem;color:var(--sub);font-weight:700;margin-left:6px}
+.ans .s{font-variant-numeric:tabular-nums;text-align:right;font-weight:800}
+.ans .b{height:8px;background:var(--line);border-radius:9px;overflow:hidden;margin-top:4px}
+.ans .b i{display:block;height:100%;background:var(--bar2)}
+.ans li.first .b i{background:var(--acc)}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0 0}
+.cmp div{border:1px solid var(--line);border-radius:6px;padding:8px;font-size:.92rem;font-weight:700;background:var(--bg)}
+.cmp div.win{border-color:var(--acc);border-width:2px;background:var(--acc-soft)}
+.cmp small{display:block;font-size:.75rem;color:var(--sub);font-weight:700}
+.rd{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 0}
+.rd label{display:flex;align-items:center;gap:6px;min-height:44px;font-weight:700;border:1px solid var(--line);border-radius:6px;padding:0 12px;background:var(--bg)}
+.rd input{width:20px;height:20px;accent-color:var(--acc)}
+.res{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 0}
+.res span{font-size:.95rem;font-weight:700;padding:6px 10px;border-radius:6px;border:1px solid var(--line);background:var(--bg)}
+.res span.ok{background:var(--acc);border-color:var(--acc);color:var(--on-acc)}
+.res span.ng{border-color:var(--warn);border-style:dashed}
+.res span.idk{color:var(--sub)}
+.tally{font-size:1rem;font-weight:800;margin:10px 0 0}
+
+.mem{display:grid;grid-template-columns:1fr 3.2em;gap:8px;align-items:center;padding:7px 8px;border:1px solid var(--line);border-radius:6px;margin:0 0 6px;background:var(--bg)}
+.mem.pick{border-color:var(--acc);border-width:2px;background:var(--acc-soft)}
+.mem .tx{font-size:.95rem;font-weight:700;line-height:1.45}
+.mem .sm{font-variant-numeric:tabular-nums;text-align:right;font-weight:800;font-size:.95rem}
+.mem .b{grid-column:1/-1;height:6px;background:var(--line);border-radius:9px;overflow:hidden}
+.mem .b i{display:block;height:100%;background:var(--bar2)}
+.mem.pick .b i{background:var(--acc)}
+.prompt{border:1px solid var(--line);border-radius:6px;padding:10px;background:var(--bg);font-size:.95rem;font-weight:700}
+.prompt small{display:block;font-size:.75rem;color:var(--sub);font-weight:700}
+.prompt .sh{color:var(--acc)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:480px){.two{grid-template-columns:1fr}}
+.big2{font-size:1.9rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
+.cmpb{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0 0}
+.cmpb>div{border:1px solid var(--line);border-radius:6px;padding:8px;background:var(--bg);font-weight:700;font-size:.9rem}
+.cmpb>div.win{border-color:var(--acc);border-width:2px;background:var(--acc-soft)}
+.cmpb small{display:block;font-size:.75rem;color:var(--sub);font-weight:700}
+.cmpb .big2{margin-top:2px}
+
+.tiles{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin:6px 0 0}
+.tl{position:relative;border:1px solid var(--line);border-radius:6px;padding:6px 2px 8px;text-align:center;background:var(--bg);color:var(--ink);font-weight:700;font-size:.85rem;min-height:56px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:2px;font-variant-numeric:tabular-nums}
+.tl small{font-size:.7rem;color:var(--sub);font-weight:700;line-height:1.2}
+.tl.in{border-color:var(--acc);background:var(--card)}
+.tl.out{border-style:dashed;color:var(--sub);background:transparent;opacity:.8}
+.tl.key{border-width:2px}
+.tl.key.in{background:var(--acc-soft)}
+.tl.memo{border-color:var(--warn)}
+.tl .wb{position:absolute;left:4px;right:4px;bottom:3px;height:4px;background:var(--line);border-radius:9px;overflow:hidden}
+.tl .wb i{display:block;height:100%;background:var(--acc)}
+.legend2{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.78rem;color:var(--sub);font-weight:700;margin:8px 0 0}
+.legend2 b{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:4px;border:1px solid var(--acc);background:var(--card)}
+.legend2 b.o{border-style:dashed;border-color:var(--sub);background:transparent}
+.legend2 b.k{border-width:2px;background:var(--acc-soft)}
+.share{display:flex;align-items:baseline;gap:10px;margin:0 0 6px}
+.share .big2{min-width:3.2em}
+.share span{font-size:.85rem;color:var(--sub);font-weight:700}
+.pbar{height:10px;background:var(--line);border-radius:9px;overflow:hidden}
+.pbar i{display:block;height:100%;background:var(--acc)}
+.pos{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:3px;align-items:end;height:90px;margin:8px 0 0}
+.pos div{display:flex;align-items:flex-end;justify-content:center;height:100%}
+.pos i{display:block;width:100%;background:var(--bar2);border-radius:3px 3px 0 0}
+.pos div.me i{background:var(--acc)}
+.pos div.cut i{background:transparent;border:1px dashed var(--sub);border-bottom:0}
+.posl{display:flex;justify-content:space-between;font-size:.75rem;color:var(--sub);font-weight:700;margin:2px 0 0}
+.acts{list-style:none;margin:0;padding:0}
+.acts li{padding:8px 0;border-bottom:1px solid var(--line)}
+.acts li:last-child{border-bottom:0}
+.acts .row{display:grid;grid-template-columns:1fr 3.2em;gap:8px;align-items:baseline}
+.acts .tx{font-weight:700}
+.acts .s{font-variant-numeric:tabular-nums;text-align:right;font-weight:800}
+.acts .b{height:8px;background:var(--line);border-radius:9px;overflow:hidden;margin-top:4px}
+.acts .b i{display:block;height:100%;background:var(--bar2)}
+.acts li.first .b i{background:var(--acc)}
+.steps{display:grid;gap:8px;margin:6px 0 0}
+.stp{border:1px solid var(--line);border-radius:6px;padding:8px 10px;background:var(--bg)}
+.stp small{display:block;font-size:.75rem;color:var(--sub);font-weight:700}
+.stp b{font-weight:800;word-break:break-all}
+.stp.hi{border-color:var(--acc);border-width:2px;background:var(--acc-soft)}
+.stp.off{border-style:dashed;color:var(--sub)}
+.mono{font-family:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace}
+.res span.tl2{font-weight:400;font-size:.8rem;color:var(--sub);margin-right:4px}
+.sl2{display:grid;grid-template-columns:7.5em 1fr 3em;gap:8px;align-items:center;margin:4px 0}
+.sl2 span{font-size:.85rem;font-weight:700}.sl2 output{font-variant-numeric:tabular-nums;text-align:right;font-weight:700}
+
+.trace{display:grid;gap:6px;margin:6px 0 0}
+.flow4{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:4px;text-align:center;font-size:.85rem;font-weight:700;margin:6px 0 2px}
+.flow4 div{border:1px solid var(--line);border-radius:6px;padding:8px 4px;background:var(--card)}
+.flow4 .hi{border-color:var(--acc);background:var(--acc-soft)}
+.flow4 i{font-style:normal;color:var(--sub)}
+.loopn{font-size:.82rem;color:var(--acc);font-weight:800;text-align:center;margin:2px 0 0}
+.res span.to{border-color:var(--warn);color:var(--warn)}
+</style>
+</head>
+<body>
+<main>
+<p class="tag">チャピのAI講義室｜第34回｜くわしく見る版</p>
+<h1>AIが、やり直しながら、仕事を終えるまで</h1>
+<p class="lead">仕事は同じ（おにぎり28個の代金。検索で値段を調べ、電卓で掛け算）です。気づく力、上限回数、道具の失敗率、念のためのやり直しを動かして、結果がどう変わるかを見ます。</p>
+
+<button type="button" id="go">同じ仕事を、やらせる</button>
+
+<section class="panel" aria-label="設定">
+  <p class="cap">設定を動かす</p>
+  <div class="sl2"><span>気づく力</span><input type="range" id="sC" min="0" max="100" step="10" value="70" aria-label="結果がおかしいと気づく確率（パーセント）"><output id="oC">70%</output></div>
+  <div class="sl2"><span>上限回数</span><input type="range" id="sL" min="2" max="10" step="1" value="6" aria-label="道具を呼べる上限回数"><output id="oL">6</output></div>
+  <div class="sl2"><span>検索の成功</span><input type="range" id="sS1" min="50" max="100" step="5" value="80" aria-label="検索の結果が正しい確率（パーセント）"><output id="oS1">80%</output></div>
+  <div class="sl2"><span>電卓の成功</span><input type="range" id="sS2" min="50" max="100" step="5" value="90" aria-label="電卓の結果が正しい確率（パーセント）"><output id="oS2">90%</output></div>
+  <div class="sl2"><span>念のため</span><input type="range" id="sW" min="0" max="50" step="10" value="0" aria-label="正しい結果でも、念のためやり直す確率（パーセント）"><output id="oW">0%</output></div>
+  <p class="hint">「念のため」は、正しい結果でも、疑ってやり直してしまう割合です。</p>
+  <div class="rd"><label><input type="radio" name="n" value="10" checked>10回やらせる</label><label><input type="radio" name="n" value="100">100回やらせる</label></div>
+</section>
+
+<section class="panel" aria-live="polite">
+  <p class="cap">① 結果の確率（計算）</p>
+  <div class="cmpb" id="cmp"></div>
+  <p class="verdict" id="verdict"></p>
+  <p class="note" id="rt"></p>
+</section>
+
+<section class="panel" aria-live="polite">
+  <p class="cap">② 上限回数を変えると（今の設定のまま）</p>
+  <svg class="chart" id="chart" viewBox="0 0 320 170" role="img" aria-label="上限回数ごとの、正解の確率と時間切れの確率"></svg>
+  <p class="legend">太い線：正解の確率　／　点線：時間切れの確率</p>
+</section>
+
+<section class="panel" aria-live="polite">
+  <p class="cap">③ ある1回の流れ</p>
+  <div class="trace" id="trace"></div>
+</section>
+
+<section class="panel" aria-live="polite">
+  <p class="cap">④ やらせた結果</p>
+  <div class="res" id="res1"></div>
+  <p class="tally" id="t1" style="margin-top:6px">「同じ仕事を、やらせる」を押してください。</p>
+  <p class="note" id="rnote"></p>
+</section>
+
+<details>
+<summary>ここで、何が起きているの？</summary>
+<p>道具を呼ぶたびに、結果が正しいか、間違っているかが決まります。間違っていたら、「気づく力」の確率で、おかしいと気づいて、やり直します。気づけないと、間違いに気づかないまま先へ進み、最後の答えが間違います。気づけるのは、エラーが出た、結果が空だった、結果が食い違った、のように、結果の中に手がかりがあるときです。上限回数に届くと、答えが出る前に止まります（時間切れ）。</p>
+</details>
+<details>
+<summary>本物の言語AIとは、同じなの？</summary>
+<p>ちがいます。このアプリは、道具2つ、仕事1つ、人が決めた説明用の確率だけの、ごく小さな例です。実際の計算結果ではありません。</p>
+</details>
+
+<div class="links">
+  <a href="../">かんたん版へ</a>
+  <a href="../../">アプリ一覧へ</a>
+</div>
+<noscript><p>このアプリを動かすには、JavaScriptをオンにしてください。</p></noscript>
+<p class="copy">© 2026 KOBATO BOOKS</p>
+</main>
+<script>
+
+var $=function(id){return document.getElementById(id);};
+function pct(x){return Math.round(x*100);}
+function pct1(x){return (Math.round(x*1000)/10).toFixed(1)+"%";}
+function rng(seed){var a=seed>>>0;return function(){a=(a+0x6D2B79F5)>>>0;var t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296;};}
+/* 仕事：アルネリア共和国の店で、おにぎり28個の代金。段階1＝検索で値段を調べる（正しい結果：347円）。段階2＝電卓で掛け算（347×28=9716）。段階3＝答える。
+   s1,s2：道具の結果が正しい確率。c：結果がおかしいと気づいてやり直す確率。w：正しい結果でも念のためやり直す確率。L：道具を呼べる上限回数。 */
+function dp(P){var S=[0,P.s1,P.s2],memo={};
+ function f(k,u,t){if(k===3)return {ok:t?0:1,ng:t?1:0,to:0,calls:0};
+  if(u>=P.L)return {ok:0,ng:0,to:1,calls:0};
+  var key=k+","+u+","+t;if(memo[key])return memo[key];
+  var s=S[k],r={ok:0,ng:0,to:0,calls:1};
+  function add(p,x){r.ok+=p*x.ok;r.ng+=p*x.ng;r.to+=p*x.to;r.calls+=p*x.calls;}
+  add(s*P.w,f(k,u+1,t));add(s*(1-P.w),f(k+1,u+1,t));
+  add((1-s)*P.c,f(k,u+1,t));add((1-s)*(1-P.c),f(k+1,u+1,true));
+  return memo[key]=r;}
+ return f(1,0,false);}
+function run1(P,r){var k=1,u=0,ev=[],good=[true,true,true];
+ while(k<3){if(u>=P.L){return {out:"to",ev:ev,calls:u,ans:null};}
+  var s=k===1?P.s1:P.s2,g=r()<s,rej;u++;
+  if(g){rej=r()<P.w;}else{rej=r()<P.c;}
+  ev.push({k:k,g:g,rej:rej});
+  if(!rej){good[k]=g;k++;}}
+ var ok=good[1]&&good[2];
+ var ans=ok?"9716":(good[1]?"9616":(good[2]?"10472":"10372"));
+ return {out:ok?"ok":"ng",ev:ev,calls:u,ans:ans};}
+function runN(P,n,seed){var r=rng(seed),o=[];for(var i=0;i<n;i++)o.push(run1(P,r));return o;}
+var TOOL=["","検索(アルネリア おにぎり 値段)","電卓(値段 × 28)"];
+function resText(k,g){return k===1?(g?"347円":"374円"):(g?"9716":"9616");}
+function traceHTML(el,t,P){el.innerHTML="";
+ function add(cls,sm,tx){var d=document.createElement("div");d.className="stp "+cls;d.innerHTML="<small></small><b></b>";d.children[0].textContent=sm;d.children[1].textContent=tx;el.appendChild(d);}
+ t.ev.forEach(function(e,i){var rt=resText(e.k,e.g);
+  var note=e.g?(e.rej?"（正しいのに、念のため、やり直し）":"（正しい。次へ）"):(e.rej?"（おかしいと気づいて、やり直し）":"（間違いに気づかず、次へ）");
+  add(e.g&&!e.rej?"hi":(e.g?"off":(e.rej?"off":"off")),(i+1)+"回目の道具："+TOOL[e.k],"結果：  "+rt+"  "+note);});
+ if(t.out==="to")add("off","上限の "+P.L+" 回に届いた","答えが出る前に、止まりました。");
+ else add(t.out==="ok"?"hi":"off","最後に、答える","おにぎり28個は、"+t.ans.replace(/(\d)(\d{3})$/,"$1,$2")+"円"+(t.out==="ok"?"（正解）":"（間違い）"));}
+function resHTML(el,res){el.innerHTML="";if(res.length>10)return;res.forEach(function(t){var s=document.createElement("span");s.className=t.out==="ok"?"ok":(t.out==="to"?"to":"ng");s.textContent=(t.out==="ok"?"正解":(t.out==="to"?"時間切れ":"間違い"))+"・"+t.calls+"回";el.appendChild(s);});}
+function longest(res){var b=res[0];res.forEach(function(t){if(t.calls>b.calls)b=t;});return b;}
+
+var C=0.7,L=6,S1=0.8,S2=0.9,W=0,res=null,press=0;
+function P(){return {s1:S1,s2:S2,c:C,w:W,L:L};}
+function nsel(){var r=document.getElementsByName("n");for(var i=0;i<r.length;i++)if(r[i].checked)return +r[i].value;return 10;}
+function chart(){var svg=$("chart"),x0=34,x1=308,y0=140,y1=14,h="";
+ function X(l){return x0+(l-2)/8*(x1-x0);}function Y(p){return y0-p*(y0-y1);}
+ [0,0.5,1].forEach(function(p){h+='<line class="ax" x1="'+x0+'" x2="'+x1+'" y1="'+Y(p)+'" y2="'+Y(p)+'"/><text x="4" y="'+(Y(p)+4)+'">'+Math.round(p*100)+'%</text>';});
+ var a="",b="";for(var l=2;l<=10;l++){var d=dp({s1:S1,s2:S2,c:C,w:W,L:l});a+=(l===2?"M":"L")+X(l)+" "+Y(d.ok);b+=(l===2?"M":"L")+X(l)+" "+Y(d.to);h+='<text x="'+(X(l)-3)+'" y="158">'+l+'</text>';}
+ h+='<path class="ln" d="'+a+'"/><path d="'+b+'" fill="none" stroke="var(--warn)" stroke-width="2" stroke-dasharray="4 4"/>';
+ var dd=dp(P());h+='<circle class="dt" cx="'+X(L)+'" cy="'+Y(dd.ok)+'" r="5"/>';svg.innerHTML=h;}
+function render(){var p=P(),d=dp(p),d0=dp({s1:S1,s2:S2,c:0,w:0,L:2});
+ $("oC").textContent=pct(C)+"%";$("oL").textContent=L;$("oS1").textContent=pct(S1)+"%";$("oS2").textContent=pct(S2)+"%";$("oW").textContent=pct(W)+"%";
+ $("cmp").innerHTML='<div><small>やり直さない（正解）</small><div class="big2">'+pct1(d0.ok)+'</div></div><div class="'+(d.ok>d0.ok+0.001?"win":"")+'"><small>今の設定（正解）</small><div class="big2">'+pct1(d.ok)+'</div></div>';
+ $("verdict").textContent="今の設定：正解 "+pct1(d.ok)+"、間違い "+pct1(d.ng)+"、時間切れ "+pct1(d.to)+"。道具を呼ぶ回数は、平均 "+d.calls.toFixed(1)+"回。";
+ $("rt").textContent=d.ok>d0.ok+0.05?"やり直せることで、正解が増えています。":(d.ok<d0.ok-0.001?"この設定では、やり直さないほうが、正解が多くなっています。":"この設定では、やり直せても、正解は、ほとんど増えません。");
+ chart();
+ var t=res?longest(res):run1(p,rng(3));traceHTML($("trace"),t,p);
+ if(res){resHTML($("res1"),res);var n=res.length,ok=res.filter(function(x){return x.out==="ok";}).length,to=res.filter(function(x){return x.out==="to";}).length,cl=res.reduce(function(a,x){return a+x.calls;},0);
+  $("t1").textContent=n+"回のうち、正解 "+ok+"回、時間切れ "+to+"回、道具を呼んだ回数の平均 "+(cl/n).toFixed(2)+"回";
+  $("rnote").textContent=n>10?"回数を増やすと、結果は、上の確率に近づきます。③は、いちばん道具を呼んだ回の流れです。":"10回だと、確率からずれることがあります。100回にすると、近づきます。③は、いちばん道具を呼んだ回の流れです。";
+ }else{$("res1").innerHTML="";$("t1").textContent="「同じ仕事を、やらせる」を押してください。";$("rnote").textContent="③は、見本の1回です。";}}
+function bind(id,fn){$(id).addEventListener("input",function(){fn(+this.value);res=null;render();});}
+bind("sC",function(v){C=v/100;});bind("sL",function(v){L=v;});bind("sS1",function(v){S1=v/100;});bind("sS2",function(v){S2=v/100;});bind("sW",function(v){W=v/100;});
+var rs=document.getElementsByName("n");for(var i=0;i<rs.length;i++)rs[i].addEventListener("change",function(){res=null;render();});
+$("go").addEventListener("click",function(){press++;res=runN(P(),nsel(),31+press*89);render();});
+render();
+</script>
+</body>
+</html>
