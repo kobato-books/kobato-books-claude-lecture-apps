@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AIが、テストの点で比べられるまで｜チャピのAI講義室 第35回</title>
+<meta name="description" content="2つのAIに同じテストを受けさせて、点の高いほうを選ぶ。問題の数や、テストの問題の扱いで、その決め方がどれだけ当てになるかを、見られます。">
+<!-- OGP（SNSで共有したときの表示） -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="チャピのAI講義室｜KOBATO BOOKS">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:title" content="AIが、テストの点で比べられるまで｜チャピのAI講義室 第35回">
+<meta property="og:description" content="2つのAIに同じテストを受けさせて、点の高いほうを選ぶ。問題の数や、テストの問題の扱いで、その決め方がどれだけ当てになるかを、見られます。">
+<meta property="og:url" content="https://lecture.kobatobooks.jp/lecture35/">
+<meta property="og:image" content="https://lecture.kobatobooks.jp/lecture35/ogp.png">
+<meta property="og:image:alt" content="AIが、テストの点で比べられるまで｜チャピのAI講義室 第35回">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+:root{--bg:#eef2f6;--ink:#1b2a41;--sub:#5b6b80;--card:#fbfcfe;--line:#c7d2df;--acc:#0f7b8a;--acc-soft:#d9eef1;--on-acc:#ffffff;--warn:#a5552a;--bar2:#9aa9bb}
+@media (prefers-color-scheme:dark){:root{--bg:#121a26;--ink:#e6edf6;--sub:#93a3b8;--card:#18212e;--line:#2c394b;--acc:#4cc3d3;--acc-soft:#1d3a42;--on-acc:#0d1b24;--warn:#e39a6f;--bar2:#56667a}}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Hiragino Sans","BIZ UDPGothic","Yu Gothic","Noto Sans JP",system-ui,sans-serif;line-height:1.7;-webkit-text-size-adjust:100%;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+main{max-width:560px;margin:0 auto;padding:24px 16px 56px}
+.tag{font-size:.82rem;color:var(--sub);margin:0 0 4px;font-weight:700}
+h1{font-size:clamp(1.5rem,6.4vw,2rem);line-height:1.35;margin:0 0 6px}
+.lead{color:var(--sub);margin:0 0 18px}
+.cap{display:block;font-size:.8rem;color:var(--sub);font-weight:700;margin:0 0 6px}
+#go{display:block;width:100%;margin:0 0 20px;min-height:60px;font:inherit;font-size:1.2rem;font-weight:800;color:var(--on-acc);background:var(--acc);border:0;border-radius:8px;cursor:pointer}
+#go:active{transform:translateY(2px)}
+#go:focus-visible,a:focus-visible,summary:focus-visible,.chip:focus-visible{outline:3px solid var(--warn);outline-offset:3px}
+#go:disabled{opacity:.7;cursor:default}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px 14px 16px;margin-bottom:14px}
+.prog{display:flex;align-items:baseline;gap:8px;margin:0 0 8px}
+.prog b{font-size:1.6rem;font-variant-numeric:tabular-nums;line-height:1.1}
+.prog span{font-size:.85rem;color:var(--sub);font-weight:700}
+.bar{height:6px;background:var(--line);border-radius:9px;overflow:hidden;margin:0 0 10px}
+.bar i{display:block;height:100%;width:0;background:var(--acc)}
+ol.sents{list-style:none;margin:0;padding:0;columns:2;column-gap:14px;font-size:.92rem}
+@media (max-width:480px){ol.sents{columns:1}}
+ol.sents li{padding:1px 6px;border-radius:4px;color:var(--sub);break-inside:avoid;border-left:3px solid transparent}
+ol.sents li.done{color:var(--ink)}
+ol.sents li.hit{background:var(--acc-soft);border-left-color:var(--acc);color:var(--ink);font-weight:700}
+ol.sents li.now{background:var(--acc-soft);border-left-color:var(--acc);color:var(--ink);font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:1.1rem;padding:8px 14px;min-height:44px;border:1px solid var(--ink);border-radius:6px;background:var(--bg);color:var(--ink);cursor:pointer}
+.chip[aria-pressed=true]{background:var(--acc);border-color:var(--acc);color:var(--on-acc);font-weight:800}
+.chip:disabled{opacity:.45;cursor:default}
+.hint{font-size:.85rem;color:var(--sub);margin:10px 0 0}
+.rank{margin:0;padding:0;list-style:none}
+.rank li{display:grid;grid-template-columns:3.2em 1fr 3em;align-items:center;column-gap:8px;row-gap:3px;padding:6px 0;border-bottom:1px solid var(--line)}
+.rank li:last-child{border-bottom:0}
+.rank .no{font-size:.85rem;color:var(--sub);font-weight:700}
+.rank .w{font-size:1.1rem;font-weight:700;line-height:1.4}
+.rank .b{grid-column:1/-1;height:8px;background:var(--line);border-radius:9px;overflow:hidden}
+.rank .b i{display:block;height:100%;background:var(--bar2)}
+.rank li.first .b i{background:var(--acc)}
+.rank .s{font-variant-numeric:tabular-nums;text-align:right;font-weight:700}
+.ctx{font-size:.92rem;margin:10px 0 0;color:var(--ink)}
+.ctx b{font-weight:800}
+.flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:4px;text-align:center;font-size:.85rem;font-weight:700;margin:6px 0 2px}
+.flow div{border:1px solid var(--line);border-radius:6px;padding:8px 4px;background:var(--card)}
+.flow .hi{border-color:var(--acc);background:var(--acc-soft)}
+.flow i{font-style:normal;color:var(--sub)}
+.pre{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 4px}
+.tile{font-size:1.15rem;font-weight:700;padding:8px 12px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--sub)}
+.tile.on{background:var(--acc);border-color:var(--acc);color:var(--on-acc)}
+.tile.q{background:transparent;border-style:dashed;color:var(--ink)}
+.verdict{font-weight:800;margin:10px 0 0}
+.legend{font-size:.82rem;color:var(--sub);margin:6px 0 0}
+details{border-top:1px solid var(--line);padding:10px 0}
+details:last-of-type{border-bottom:1px solid var(--line)}
+summary{cursor:pointer;font-weight:700}
+details p{color:var(--sub);font-size:.92rem}
+.links{display:flex;flex-direction:column;gap:6px;margin-top:22px}
+.links a{color:var(--acc);font-weight:700}
+.copy{text-align:center;font-size:.8rem;color:var(--sub);margin:32px 0 0}
+
+.words{display:flex;gap:6px;justify-content:center;margin:4px 0 0;flex-wrap:nowrap}
+.wcol{flex:1 1 0;min-width:0;max-width:110px;text-align:center}
+.wcol .t{font-size:1.05rem;font-weight:700;padding:8px 2px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);word-break:keep-all}
+.wcol.q .t{border-color:var(--acc);border-width:2px}
+.wcol.q.dash .t{border-style:dashed}
+.wcol .sc{font-size:.8rem;color:var(--sub);font-variant-numeric:tabular-nums;min-height:1.4em;margin-top:4px}
+.wcol .pc{font-size:.95rem;font-weight:800;font-variant-numeric:tabular-nums;min-height:1.5em}
+.col{height:84px;display:flex;align-items:flex-end;justify-content:center}
+.col i{display:block;width:60%;background:var(--bar2);border-radius:4px 4px 0 0;min-height:0}
+.wcol.top .col i{background:var(--acc)}
+.arcs{display:block;width:100%;height:46px;margin:0 0 -2px}
+.stepno{font-size:.82rem;color:var(--sub);font-weight:700;margin:0 0 6px}
+
+input[type=range]{width:100%;accent-color:var(--acc)}
+.sl{display:grid;grid-template-columns:4.5em 1fr 2.2em;gap:8px;align-items:center;margin:2px 0}
+.sl span{font-size:.9rem;font-weight:700}.sl output{font-variant-numeric:tabular-nums;text-align:right;font-weight:700}
+.btn{font:inherit;font-weight:700;min-height:44px;padding:8px 14px;border-radius:6px;border:1px solid var(--ink);background:var(--bg);color:var(--ink);cursor:pointer}
+.btn:focus-visible{outline:3px solid var(--warn);outline-offset:3px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th,td{border-bottom:1px solid var(--line);padding:6px 4px;text-align:left;font-variant-numeric:tabular-nums}
+th{color:var(--sub);font-size:.8rem}
+td.n{text-align:right}
+tr.last td{color:var(--sub)}
+.tbl{overflow-x:auto}
+
+.rows{display:grid;gap:6px;margin:6px 0 0}
+.rl{font-size:.82rem;color:var(--sub);font-weight:700;margin:10px 0 2px}
+.g{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:6px}
+.g .w{font-size:1.05rem;font-weight:700;padding:8px 2px;border:1px solid var(--line);border-radius:6px;background:var(--bg);text-align:center;word-break:keep-all}
+.g .w.q{border-color:var(--acc);border-width:2px}
+.g .c{border:1px solid var(--line);border-radius:6px;padding:7px 2px;text-align:center;font-weight:800;font-variant-numeric:tabular-nums;color:var(--ink)}
+.g .c.top{border-color:var(--acc);color:var(--ink)}
+.g .c.off{color:var(--sub);font-weight:400}
+.mixl{font-size:.92rem;margin:4px 0 0}
+.mixl b{font-weight:800}
+.sw{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+.chk{display:flex;align-items:center;gap:8px;min-height:44px;font-weight:700}
+.chk input{width:22px;height:22px;accent-color:var(--acc)}
+.q3{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 10px}
+.big{font-size:2rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
+.chart{display:block;width:100%;height:auto;margin:6px 0 0}
+.chart .ax{stroke:var(--line);stroke-width:1}
+.chart .ln{fill:none;stroke:var(--acc);stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
+.chart .dt{fill:var(--acc)}
+.chart text{fill:var(--sub);font-size:11px;font-family:inherit}
+.note{font-size:.88rem;color:var(--sub);margin:8px 0 0}
+
+.ans{list-style:none;margin:0;padding:0}
+.ans li{padding:8px 0;border-bottom:1px solid var(--line)}
+.ans li:last-child{border-bottom:0}
+.ans .row{display:grid;grid-template-columns:1fr 3em;gap:8px;align-items:baseline}
+.ans .tx{font-size:1rem;font-weight:700;line-height:1.5}
+.ans .ty{font-size:.78rem;color:var(--sub);font-weight:700;margin-left:6px}
+.ans .s{font-variant-numeric:tabular-nums;text-align:right;font-weight:800}
+.ans .b{height:8px;background:var(--line);border-radius:9px;overflow:hidden;margin-top:4px}
+.ans .b i{display:block;height:100%;background:var(--bar2)}
+.ans li.first .b i{background:var(--acc)}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0 0}
+.cmp div{border:1px solid var(--line);border-radius:6px;padding:8px;font-size:.92rem;font-weight:700;background:var(--bg)}
+.cmp div.win{border-color:var(--acc);border-width:2px;background:var(--acc-soft)}
+.cmp small{display:block;font-size:.75rem;color:var(--sub);font-weight:700}
+.rd{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 0}
+.rd label{display:flex;align-items:center;gap:6px;min-height:44px;font-weight:700;border:1px solid var(--line);border-radius:6px;padding:0 12px;background:var(--bg)}
+.rd input{width:20px;height:20px;accent-color:var(--acc)}
+.res{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 0}
+.res span{font-size:.95rem;font-weight:700;padding:6px 10px;border-radius:6px;border:1px solid var(--line);background:var(--bg)}
+.res span.ok{background:var(--acc);border-color:var(--acc);color:var(--on-acc)}
+.res span.ng{border-color:var(--warn);border-style:dashed}
+.res span.idk{color:var(--sub)}
+.tally{font-size:1rem;font-weight:800;margin:10px 0 0}
+
+.mem{display:grid;grid-template-columns:1fr 3.2em;gap:8px;align-items:center;padding:7px 8px;border:1px solid var(--line);border-radius:6px;margin:0 0 6px;background:var(--bg)}
+.mem.pick{border-color:var(--acc);border-width:2px;background:var(--acc-soft)}
+.mem .tx{font-size:.95rem;font-weight:700;line-height:1.45}
+.mem .sm{font-variant-numeric:tabular-nums;text-align:right;font-weight:800;font-size:.95rem}
+.mem .b{grid-column:1/-1;height:6px;background:var(--line);border-radius:9px;overflow:hidden}
+.mem .b i{display:block;height:100%;background:var(--bar2)}
+.mem.pick .b i{background:var(--acc)}
+.prompt{border:1px solid var(--line);border-radius:6px;padding:10px;background:var(--bg);font-size:.95rem;font-weight:700}
+.prompt small{display:block;font-size:.75rem;color:var(--sub);font-weight:700}
+.prompt .sh{color:var(--acc)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:480px){.two{grid-template-columns:1fr}}
+.big2{font-size:1.9rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
+.cmpb{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0 0}
+.cmpb>div{border:1px solid var(--line);border-radius:6px;padding:8px;background:var(--bg);font-weight:700;font-size:.9rem}
+.cmpb>div.win{border-color:var(--acc);border-width:2px;background:var(--acc-soft)}
+.cmpb small{display:block;font-size:.75rem;color:var(--sub);font-weight:700}
+.cmpb .big2{margin-top:2px}
+
+.tiles{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin:6px 0 0}
+.tl{position:relative;border:1px solid var(--line);border-radius:6px;padding:6px 2px 8px;text-align:center;background:var(--bg);color:var(--ink);font-weight:700;font-size:.85rem;min-height:56px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:2px;font-variant-numeric:tabular-nums}
+.tl small{font-size:.7rem;color:var(--sub);font-weight:700;line-height:1.2}
+.tl.in{border-color:var(--acc);background:var(--card)}
+.tl.out{border-style:dashed;color:var(--sub);background:transparent;opacity:.8}
+.tl.key{border-width:2px}
+.tl.key.in{background:var(--acc-soft)}
+.tl.memo{border-color:var(--warn)}
+.tl .wb{position:absolute;left:4px;right:4px;bottom:3px;height:4px;background:var(--line);border-radius:9px;overflow:hidden}
+.tl .wb i{display:block;height:100%;background:var(--acc)}
+.legend2{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.78rem;color:var(--sub);font-weight:700;margin:8px 0 0}
+.legend2 b{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:4px;border:1px solid var(--acc);background:var(--card)}
+.legend2 b.o{border-style:dashed;border-color:var(--sub);background:transparent}
+.legend2 b.k{border-width:2px;background:var(--acc-soft)}
+.share{display:flex;align-items:baseline;gap:10px;margin:0 0 6px}
+.share .big2{min-width:3.2em}
+.share span{font-size:.85rem;color:var(--sub);font-weight:700}
+.pbar{height:10px;background:var(--line);border-radius:9px;overflow:hidden}
+.pbar i{display:block;height:100%;background:var(--acc)}
+.pos{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:3px;align-items:end;height:90px;margin:8px 0 0}
+.pos div{display:flex;align-items:flex-end;justify-content:center;height:100%}
+.pos i{display:block;width:100%;background:var(--bar2);border-radius:3px 3px 0 0}
+.pos div.me i{background:var(--acc)}
+.pos div.cut i{background:transparent;border:1px dashed var(--sub);border-bottom:0}
+.posl{display:flex;justify-content:space-between;font-size:.75rem;color:var(--sub);font-weight:700;margin:2px 0 0}
+.acts{list-style:none;margin:0;padding:0}
+.acts li{padding:8px 0;border-bottom:1px solid var(--line)}
+.acts li:last-child{border-bottom:0}
+.acts .row{display:grid;grid-template-columns:1fr 3.2em;gap:8px;align-items:baseline}
+.acts .tx{font-weight:700}
+.acts .s{font-variant-numeric:tabular-nums;text-align:right;font-weight:800}
+.acts .b{height:8px;background:var(--line);border-radius:9px;overflow:hidden;margin-top:4px}
+.acts .b i{display:block;height:100%;background:var(--bar2)}
+.acts li.first .b i{background:var(--acc)}
+.steps{display:grid;gap:8px;margin:6px 0 0}
+.stp{border:1px solid var(--line);border-radius:6px;padding:8px 10px;background:var(--bg)}
+.stp small{display:block;font-size:.75rem;color:var(--sub);font-weight:700}
+.stp b{font-weight:800;word-break:break-all}
+.stp.hi{border-color:var(--acc);border-width:2px;background:var(--acc-soft)}
+.stp.off{border-style:dashed;color:var(--sub)}
+.mono{font-family:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace}
+.res span.tl2{font-weight:400;font-size:.8rem;color:var(--sub);margin-right:4px}
+.sl2{display:grid;grid-template-columns:7.5em 1fr 3em;gap:8px;align-items:center;margin:4px 0}
+.sl2 span{font-size:.85rem;font-weight:700}.sl2 output{font-variant-numeric:tabular-nums;text-align:right;font-weight:700}
+
+.trace{display:grid;gap:6px;margin:6px 0 0}
+.flow4{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:4px;text-align:center;font-size:.85rem;font-weight:700;margin:6px 0 2px}
+.flow4 div{border:1px solid var(--line);border-radius:6px;padding:8px 4px;background:var(--card)}
+.flow4 .hi{border-color:var(--acc);background:var(--acc-soft)}
+.flow4 i{font-style:normal;color:var(--sub)}
+.loopn{font-size:.82rem;color:var(--acc);font-weight:800;text-align:center;margin:2px 0 0}
+.res span.to{border-color:var(--warn);color:var(--warn)}
+
+.sc2{display:grid;grid-template-columns:1fr;gap:10px;margin:6px 0 0}
+.sc2 .r{display:grid;grid-template-columns:3.4em 1fr 4.6em;gap:8px;align-items:center}
+.sc2 .r span{font-weight:800}
+.sc2 .r output{font-variant-numeric:tabular-nums;text-align:right;font-weight:800}
+.sc2 .bb{height:14px;background:var(--line);border-radius:9px;overflow:hidden}
+.sc2 .bb i{display:block;height:100%;background:var(--bar2)}
+.sc2 .r.top .bb i{background:var(--acc)}
+.tri{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:6px 0 0}
+.tri>div{border:1px solid var(--line);border-radius:6px;padding:8px;background:var(--bg);font-weight:700;font-size:.85rem}
+.tri>div.win{border-color:var(--acc);border-width:2px;background:var(--acc-soft)}
+.tri small{display:block;font-size:.72rem;color:var(--sub);font-weight:700}
+.tri .big2{font-size:1.5rem;margin-top:2px}
+.res span.ta{font-weight:700}
+.res span.tb{border-color:var(--warn);border-style:dashed}
+</style>
+</head>
+<body>
+<main>
+<p class="tag">チャピのAI講義室｜第35回</p>
+<h1>AIが、テストの点で比べられるまで</h1>
+<p class="lead">AI-AとAI-Bに、同じテストを受けさせて、点の高いほうを「良いAI」とします。その決め方は、いつも正しいでしょうか。問題の数と、テストの問題の扱いを変えて、見比べてください。</p>
+
+<button type="button" id="go">同じテストを、10回受けさせる</button>
+
+<section class="panel" aria-label="テストの条件を選ぶ">
+  <p class="cap">テストの問題の数</p>
+  <div class="chips" id="chipsN"></div>
+  <p class="cap" style="margin-top:12px">テスト問題の扱い</p>
+  <div class="chips" id="chipsL"></div>
+  <p class="hint" id="qnote"></p>
+</section>
+
+<section class="panel">
+  <p class="cap">① 2つのAIの、本当の実力</p>
+  <div class="cmpb" id="real"></div>
+  <p class="note" id="realnote"></p>
+</section>
+
+<section class="panel" aria-live="polite">
+  <p class="cap">② ある1回のテストの点</p>
+  <div class="sc2" id="bars"></div>
+  <p class="note" id="barnote"></p>
+</section>
+
+<section class="panel" aria-live="polite">
+  <p class="cap">③ テストの点で、どちらが上になる確率（計算）</p>
+  <div class="tri" id="tri"></div>
+  <p class="verdict" id="verdict"></p>
+</section>
+
+<section class="panel" aria-live="polite">
+  <p class="cap">④ 同じテストを、10回受けさせた結果</p>
+  <div class="res" id="res1"></div>
+  <p class="tally" id="t1" style="margin-top:6px">「同じテストを、10回受けさせる」を押してください。</p>
+  <p class="note" id="rnote"></p>
+</section>
+
+<details>
+<summary>何をしているの？</summary>
+<p>AI-AとAI-Bに、同じ問題数のテストを受けさせて、正解の数を比べています。テストは、毎回、別の問題です。AIの「本当の実力」は、新しい問題での正解率です。ただし、テストの点は、その問題の出方で、少しぶれます。</p>
+</details>
+<details>
+<summary>問題が少ないと、なぜ順番が入れ替わるの？</summary>
+<p>本当の実力が80%のAIでも、10問だと、たまたま7問しか正解できないことがあります。実力が75%のAIが、たまたま8問正解することもあります。問題が少ないほど、たまたまの影響が大きくなります。問題を増やすと、点は、本当の実力に近づきます。</p>
+</details>
+<details>
+<summary>「テスト問題が、学習に混ざっていた」とは？</summary>
+<p>AIが、学習の途中で、テストの問題と答えを見てしまっていた場合です。見てしまった問題は、覚えているので、正解できます。すると、新しい問題での本当の実力は同じでも、テストの点だけが高くなります。問題を増やしても、この見かけの高さは直りません。むしろ、まちがった順番が、確かなものに見えてしまいます。</p>
+</details>
+<details>
+<summary>本物の言語AIとは、同じなの？</summary>
+<p>ちがいます。このアプリは、2つのAI、正解か不正解かだけの問題、人が決めた説明用の確率だけの、ごく小さな例です。実際の言語AIの評価結果ではありません。</p>
+</details>
+
+<div class="links">
+  <a href="detail/">くわしく見る（実力の差・問題数・漏れの割合）</a>
+  <a href="../">アプリ一覧へ</a>
+</div>
+<noscript><p>このアプリを動かすには、JavaScriptをオンにしてください。</p></noscript>
+<p class="copy">© 2026 KOBATO BOOKS</p>
+</main>
+<script>
+
+var $=function(id){return document.getElementById(id);};
+function pct(x){return Math.round(x*100);}
+function pct1(x){return (Math.round(x*1000)/10).toFixed(1)+"%";}
+function rng(seed){var a=seed>>>0;return function(){a=(a+0x6D2B79F5)>>>0;var t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296;};}
+/* AI-A、AI-Bに、同じテスト（n問）を受けさせる。pa,pb＝新しい問題での本当の正解率（説明用の仮定）。
+   leak＝テスト問題のうち、AI-Bが学習中に見てしまっていた割合（見た問題は、必ず正解）。 */
+var LF=[0];for(var i=1;i<=1000;i++)LF[i]=LF[i-1]+Math.log(i);
+function pmf(n,p){var o=[];for(var k=0;k<=n;k++)o.push(Math.exp(LF[n]-LF[k]-LF[n-k]+k*Math.log(p)+(n-k)*Math.log(1-p)));return o;}
+function eff(P){return {a:P.pa,b:P.leak+(1-P.leak)*P.pb};}
+function dist(n,P){var e=eff(P),A=pmf(n,e.a),B=pmf(n,e.b),cdf=0,a=0,t=0;
+ for(var j=0;j<=n;j++){a+=A[j]*cdf;t+=A[j]*B[j];cdf+=B[j];}
+ return {A:a,T:t,B:Math.max(0,1-a-t)};}
+function sd(p,n){return Math.sqrt(p*(1-p)/n);}
+function test1(P,n,r){var e=eff(P),a=0,b=0;for(var i=0;i<n;i++){if(r()<e.a)a++;if(r()<e.b)b++;}return {a:a,b:b,n:n};}
+function runN(P,n,k,seed){var r=rng(seed),o=[];for(var i=0;i<k;i++)o.push(test1(P,n,r));return o;}
+function verdictOf(t){return t.a>t.b?"A":(t.b>t.a?"B":"=");}
+function resHTML(el,res){el.innerHTML="";if(res.length>10)return;res.forEach(function(t,i){var v=verdictOf(t),s=document.createElement("span");s.className=v==="A"?"ta ok":(v==="B"?"tb":"idk");
+ var sc=t.n<=10?(t.a+"対"+t.b):(Math.round(t.a/t.n*1000)/10+"%対"+Math.round(t.b/t.n*1000)/10+"%");
+ s.textContent=(i+1)+"回目　"+sc+"　"+(v==="A"?"Aが上":(v==="B"?"Bが上":"同点"));el.appendChild(s);});}
+function tally(res){var a=0,b=0,e=0;res.forEach(function(t){var v=verdictOf(t);if(v==="A")a++;else if(v==="B")b++;else e++;});return {a:a,b:b,e:e};}
+function bars(el,t){var n=t.n;function row(nm,x,top){return '<div class="r'+(top?' top':'')+'"><span>'+nm+'</span><div class="bb"><i style="width:'+(x/n*100)+'%"></i></div><output>'+(n<=10?(x+"問正解"):(x+"問（"+(Math.round(x/n*1000)/10)+"%）"))+'</output></div>';}
+ el.innerHTML=row("AI-A",t.a,t.a>=t.b)+row("AI-B",t.b,t.b>=t.a);}
+
+var NS=[10,100,1000],LS=[{name:"問題は、見ていない",l:0},{name:"Bは、問題の30%を、前もって見ていた",l:0.3}];
+var ni=0,li=0,press=0,res=null;
+function PP(){return {pa:0.8,pb:0.75,leak:LS[li].l};}
+function render(){var n=NS[ni],P=PP(),d=dist(n,P),e=eff(P);
+ var cs=$("chipsN").children;for(var k=0;k<cs.length;k++)cs[k].setAttribute("aria-pressed",k===ni?"true":"false");
+ cs=$("chipsL").children;for(k=0;k<cs.length;k++)cs[k].setAttribute("aria-pressed",k===li?"true":"false");
+ $("qnote").textContent=(li===0?"AI-AもAI-Bも、テストの問題を、前もって見ていません。":"AI-Bは、テストの問題のうち30%を、学習中に見てしまっていました（見た問題は、必ず正解します）。")+" 問題は"+n+"問です。";
+ $("real").innerHTML='<div><small>AI-A（新しい問題での正解率）</small><div class="big2">80%</div></div><div><small>AI-B（新しい問題での正解率）</small><div class="big2">75%</div></div>';
+ $("realnote").textContent="本当の実力は、AI-Aのほうが上です（説明用の仮定）。"+(li===1?"このテストでは、AI-Bの正解率が、見かけ上、"+pct1(e.b)+"になります。":"");
+ var t=res?res[0]:test1(P,n,rng(5+ni*7+li*3));
+ bars($("bars"),t);
+ $("barnote").textContent=res?"10回のうち、1回目のテストの点です。":"見本の1回です。";
+ $("tri").innerHTML='<div class="'+(d.A>=d.B&&d.A>=d.T?"win":"")+'"><small>Aが上</small><div class="big2">'+pct1(d.A)+'</div></div><div class="'+(d.T>d.A&&d.T>d.B?"win":"")+'"><small>同点</small><div class="big2">'+pct1(d.T)+'</div></div><div class="'+(d.B>d.A&&d.B>=d.T?"win":"")+'"><small>Bが上</small><div class="big2">'+pct1(d.B)+'</div></div>';
+ $("verdict").textContent=(d.A>d.B?"Aが上になる確率が高いですが":"Bが上になる確率のほうが高く")+"、このテストでは、Aが上"+pct(d.A)+"%、同点"+pct(d.T)+"%、Bが上"+pct(d.B)+"%です。"+(li===1&&d.B>d.A?"本当はAのほうが上なのに、点だけ見ると、Bのほうが良く見えます。":"");
+ if(res){resHTML($("res1"),res);var y=tally(res);$("t1").textContent="10回のうち、Aが上 "+y.a+"回、Bが上 "+y.b+"回、同点 "+y.e+"回";
+  $("rnote").textContent="10回だと、確率からずれることがあります。";}
+ else{$("res1").innerHTML="";$("t1").textContent="「同じテストを、10回受けさせる」を押してください。";$("rnote").textContent="";}}
+NS.forEach(function(n,i){var b=document.createElement("button");b.type="button";b.className="chip";b.textContent=n+"問";b.addEventListener("click",function(){ni=i;res=null;render();});$("chipsN").appendChild(b);});
+LS.forEach(function(s,i){var b=document.createElement("button");b.type="button";b.className="chip";b.textContent=s.name;b.addEventListener("click",function(){li=i;res=null;render();});$("chipsL").appendChild(b);});
+$("go").addEventListener("click",function(){press++;res=runN(PP(),NS[ni],10,21+press*97+ni*13+li*5);render();});
+render();
+</script>
+</body>
+</html>
