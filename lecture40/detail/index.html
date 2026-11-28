@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AIが、言葉と絵を、つなぐまで｜チャピのAI講義室 第40回（くわしく見る版）</title>
+<meta name="description" content="例の組の数、まちがった組の数を変えて、言葉と絵を結びつける12通りの結果を表で見比べられます。まちがった組が混ざると、結びつきがずれるようすも見られます。">
+<!-- OGP（SNSで共有したときの表示） -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="チャピのAI講義室｜KOBATO BOOKS">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:title" content="AIが、言葉と絵を、つなぐまで｜チャピのAI講義室 第40回（くわしく見る版）">
+<meta property="og:description" content="例の組の数、まちがった組の数を変えて、言葉と絵を結びつける12通りの結果を表で見比べられます。まちがった組が混ざると、結びつきがずれるようすも見られます。">
+<meta property="og:url" content="https://lecture.kobatobooks.jp/lecture40/detail/">
+<meta property="og:image" content="https://lecture.kobatobooks.jp/lecture40/detail/ogp.png">
+<meta property="og:image:alt" content="AIが、言葉と絵を、つなぐまで｜チャピのAI講義室 第40回（くわしく見る版）">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+
+:root{--bg:#eef2f6;--ink:#1b2a41;--sub:#5b6b80;--card:#fbfcfe;--line:#c7d2df;--acc:#0f7b8a;--acc-soft:#d9eef1;--on-acc:#ffffff;--warn:#a5552a;--bar2:#9aa9bb}
+@media (prefers-color-scheme:dark){:root{--bg:#121a26;--ink:#e6edf6;--sub:#93a3b8;--card:#18212e;--line:#2c394b;--acc:#4cc3d3;--acc-soft:#1d3a42;--on-acc:#0d1b24;--warn:#e39a6f;--bar2:#56667a}}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Hiragino Sans","BIZ UDPGothic","Yu Gothic","Noto Sans JP",system-ui,sans-serif;line-height:1.7;-webkit-text-size-adjust:100%;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+main{max-width:560px;margin:0 auto;padding:24px 16px 56px}
+.tag{font-size:.82rem;color:var(--sub);margin:0 0 4px;font-weight:700}
+h1{font-size:clamp(1.5rem,6.4vw,2rem);line-height:1.35;margin:0 0 6px}
+.lead{color:var(--sub);margin:0 0 18px}
+.cap{display:block;font-size:.8rem;color:var(--sub);font-weight:700;margin:0 0 6px}
+#go{display:block;width:100%;margin:0 0 20px;min-height:60px;font:inherit;font-size:1.2rem;font-weight:800;color:var(--on-acc);background:var(--acc);border:0;border-radius:8px;cursor:pointer}
+#go:active{transform:translateY(2px)}
+#go:focus-visible,a:focus-visible,summary:focus-visible,.chip:focus-visible{outline:3px solid var(--warn);outline-offset:3px}
+#go:disabled{opacity:.7;cursor:default}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px 14px 16px;margin-bottom:14px}
+.prog{display:flex;align-items:baseline;gap:8px;margin:0 0 8px}
+.prog b{font-size:1.6rem;font-variant-numeric:tabular-nums;line-height:1.1}
+.prog span{font-size:.85rem;color:var(--sub);font-weight:700}
+.bar{height:6px;background:var(--line);border-radius:9px;overflow:hidden;margin:0 0 10px}
+.bar i{display:block;height:100%;width:0;background:var(--acc)}
+ol.sents{list-style:none;margin:0;padding:0;columns:2;column-gap:14px;font-size:.92rem}
+@media (max-width:480px){ol.sents{columns:1}}
+ol.sents li{padding:1px 6px;border-radius:4px;color:var(--sub);break-inside:avoid;border-left:3px solid transparent}
+ol.sents li.done{color:var(--ink)}
+ol.sents li.hit{background:var(--acc-soft);border-left-color:var(--acc);color:var(--ink);font-weight:700}
+ol.sents li.now{background:var(--acc-soft);border-left-color:var(--acc);color:var(--ink);font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:1.1rem;padding:8px 14px;min-height:44px;border:1px solid var(--ink);border-radius:6px;background:var(--bg);color:var(--ink);cursor:pointer}
+.chip[aria-pressed=true]{background:var(--acc);border-color:var(--acc);color:var(--on-acc);font-weight:800}
+.chip:disabled{opacity:.45;cursor:default}
+.hint{font-size:.85rem;color:var(--sub);margin:10px 0 0}
+.rank{margin:0;padding:0;list-style:none}
+.rank li{display:grid;grid-template-columns:3.2em 1fr 3em;align-items:center;column-gap:8px;row-gap:3px;padding:6px 0;border-bottom:1px solid var(--line)}
+.rank li:last-child{border-bottom:0}
+.rank .no{font-size:.85rem;color:var(--sub);font-weight:700}
+.rank .w{font-size:1.1rem;font-weight:700;line-height:1.4}
+.rank .b{grid-column:1/-1;height:8px;background:var(--line);border-radius:9px;overflow:hidden}
+.rank .b i{display:block;height:100%;background:var(--bar2)}
+.rank li.first .b i{background:var(--acc)}
+.rank .s{font-variant-numeric:tabular-nums;text-align:right;font-weight:700}
+.ctx{font-size:.92rem;margin:10px 0 0;color:var(--ink)}
+.ctx b{font-weight:800}
+.flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:4px;text-align:center;font-size:.85rem;font-weight:700;margin:6px 0 2px}
+.flow div{border:1px solid var(--line);border-radius:6px;padding:8px 4px;background:var(--card)}
+.flow .hi{border-color:var(--acc);background:var(--acc-soft)}
+.flow i{font-style:normal;color:var(--sub)}
+.pre{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 4px}
+.tile{font-size:1.15rem;font-weight:700;padding:8px 12px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--sub)}
+.tile.on{background:var(--acc);border-color:var(--acc);color:var(--on-acc)}
+.tile.q{background:transparent;border-style:dashed;color:var(--ink)}
+.verdict{font-weight:800;margin:10px 0 0}
+.legend{font-size:.82rem;color:var(--sub);margin:6px 0 0}
+details{border-top:1px solid var(--line);padding:10px 0}
+details:last-of-type{border-bottom:1px solid var(--line)}
+summary{cursor:pointer;font-weight:700}
+details p{color:var(--sub);font-size:.92rem}
+.links{display:flex;flex-direction:column;gap:6px;margin-top:22px}
+.links a{color:var(--acc);font-weight:700}
+.copy{text-align:center;font-size:.8rem;color:var(--sub);margin:32px 0 0}
+.grid{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:2px;margin:6px auto 0;max-width:var(--mw,300px)}
+.px{aspect-ratio:1/1;border:1px solid var(--line);border-radius:3px;display:flex;align-items:center;justify-content:center;font-weight:800;font-variant-numeric:tabular-nums;font-size:var(--fs,1rem);background:color-mix(in srgb,var(--ink) calc(var(--v)*11.1%),var(--card));color:var(--ink)}
+.px.dk{color:var(--card)}
+.px.nonum{font-size:0}
+.list{word-spacing:.35em;font-size:.88rem;word-break:break-all;line-height:1.8;margin:8px 0 0;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+.list small{display:block;font-size:.75rem;color:var(--sub);font-weight:700;font-family:inherit}
+.refs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:6px 0 0}
+.ref{border:1px solid var(--line);border-radius:6px;padding:8px 6px;background:var(--bg);text-align:center}
+.ref.win{border-color:var(--acc);border-width:2px;background:var(--acc-soft)}
+.ref .nm{font-size:.8rem;color:var(--sub);font-weight:700}
+.ref .grid{gap:1px;max-width:84px}
+.ref .px{border-radius:1px;border-width:0}
+.ref .ds{font-size:1.25rem;font-weight:800;font-variant-numeric:tabular-nums;margin-top:6px;line-height:1.1}
+.ref small{display:block;font-size:.72rem;color:var(--sub);font-weight:700}
+.ref .db{height:6px;background:var(--line);border-radius:9px;overflow:hidden;margin-top:4px}
+.ref .db i{display:block;height:100%;background:var(--bar2)}
+.ref.win .db i{background:var(--acc)}
+.ans2{font-size:1.15rem;font-weight:800;margin:12px 0 0}
+.ans2.ng{color:var(--warn)}
+.mat{width:100%;border-collapse:collapse;font-size:.9rem;margin-top:6px}
+.mat th,.mat td{border:1px solid var(--line);padding:6px 4px;text-align:center}
+.mat td.ok{background:var(--acc-soft);font-weight:800}
+.mat td.ng{color:var(--warn);font-weight:800}
+.sumline{font-size:1.05rem;font-weight:800;margin:10px 0 0}
+
+.win{border:1px solid var(--line);border-radius:8px;padding:10px 10px 12px;margin:0 0 12px;background:var(--bg)}
+.win h3{font-size:1rem;margin:0 0 6px;display:flex;align-items:center;gap:10px}
+.win .pat .grid{gap:1px;width:42px;margin:0}
+.win .pat .px{border-radius:1px;border-width:0}
+.win .row{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.win .mapw{flex:1 1 220px;min-width:0}
+.win .mapw .grid{gap:1px;max-width:300px;margin:0}
+.win .mapw .px{border-radius:1px;border-width:0;font-size:.62rem;font-weight:700}
+.win .mapw .px.top{outline:3px solid var(--warn);outline-offset:-2px;position:relative;z-index:1}
+.win .res{font-size:.9rem;margin:8px 0 0}
+.win .res b{font-size:1.1rem}
+.vec{font-size:1.5rem;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:.06em;margin:4px 0 2px}
+.vtab{width:100%;border-collapse:collapse;font-size:.95rem;margin-top:8px}
+.vtab th,.vtab td{border:1px solid var(--line);padding:6px 4px;text-align:center;font-variant-numeric:tabular-nums}
+.vtab tr.win2 td,.vtab tr.win2 th{background:var(--acc-soft);font-weight:800}
+.px.hl{outline:2px solid var(--acc);outline-offset:-1px}
+.tiegap{margin-top:6px}
+
+.pgrid{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:5px;margin:6px auto 0;max-width:320px}
+.pch{display:grid;grid-template-columns:repeat(var(--p),minmax(0,1fr));gap:0;border:2px solid var(--acc);border-radius:3px;background:var(--card);position:relative}
+.pch .px{border:0;border-radius:0;aspect-ratio:1/1;font-size:0;outline:1px solid var(--line);outline-offset:-1px}
+.pch .no{position:absolute;left:1px;top:0;font-size:.6rem;font-weight:800;color:var(--acc);background:var(--card);padding:0 2px;line-height:1.1;z-index:2;border-radius:2px}
+.tokgrid{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 0}
+.tk{min-width:3.1em;text-align:center;border:1px solid var(--line);border-radius:6px;background:var(--bg);padding:3px 6px 4px;line-height:1.2}
+.tk small{display:block;font-size:.66rem;color:var(--sub);font-weight:700}
+.tk b{font-size:1.15rem;font-variant-numeric:tabular-nums}
+.tk.hi{border-color:var(--acc);background:var(--acc-soft)}
+
+.wv{display:block;width:100%;height:auto;margin:6px 0 0;background:var(--bg);border:1px solid var(--line);border-radius:6px}
+.nums{word-spacing:.3em;font-size:.88rem;word-break:break-all;line-height:1.8;margin:8px 0 0;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);font-variant-numeric:tabular-nums}
+.nums small{display:block;font-size:.75rem;color:var(--sub);font-weight:700}
+.cmpt{width:100%;border-collapse:collapse;margin-top:8px;font-size:.95rem}
+.cmpt th,.cmpt td{border:1px solid var(--line);padding:4px 6px;text-align:center;font-variant-numeric:tabular-nums;vertical-align:middle}
+.cmpt tr.win2 td,.cmpt tr.win2 th{background:var(--acc-soft);font-weight:800}
+.cmpt svg{width:100%;max-width:150px;height:32px;display:block;margin:0 auto}
+.tablewrap{overflow-x:auto}
+.note{font-size:.85rem;color:var(--sub);margin:6px 0 0}
+
+.mp{display:block;width:100%;height:auto;margin:6px 0 0;background:var(--bg);border:1px solid var(--line);border-radius:6px}
+.mp .ax{stroke:var(--line);stroke-width:1}
+.mp .gl{stroke:var(--line);stroke-width:.5;stroke-dasharray:2 3}
+.mp text{fill:var(--ink);font-size:10px;font-weight:700;font-family:inherit}
+.mp text.s{fill:var(--sub);font-size:8.5px;font-weight:700}
+.mp .wd{fill:var(--bar2)}
+.mp .wd.win{fill:var(--acc)}
+.mp .pic{fill:var(--warn);stroke:var(--card);stroke-width:1.5}
+.mp .ln{stroke:var(--acc);stroke-width:1.6;stroke-dasharray:4 3}
+.big{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.big .grid{width:150px;max-width:150px;margin:0;gap:2px}
+.big .px{border-radius:2px;border-width:1px}
+.pair{font-size:1.5rem;font-weight:800;font-variant-numeric:tabular-nums;margin:2px 0}
+.exs{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 0}
+.ex{border:1px solid var(--line);border-radius:6px;padding:4px;background:var(--bg);text-align:center;width:58px}
+.ex .grid{gap:1px;max-width:48px}
+.ex .px{border-width:0;border-radius:1px}
+.ex small{display:block;font-size:.66rem;font-weight:700;color:var(--sub);line-height:1.2;margin-top:2px}
+.ex.bad{border-color:var(--warn)}
+.ex.bad small{color:var(--warn)}
+
+</style>
+</head>
+<body>
+<main>
+<p class="tag">チャピのAI講義室｜第40回｜くわしく見る版</p>
+<h1>AIが、言葉と絵を、つなぐまで</h1>
+<p class="lead">例の組の数と、まちがった組の数を変えて、12通りの結びつきを見比べます。</p>
+<button type="button" id="go">言葉と絵を、つないで探す</button>
+<section class="panel" aria-label="絵とつなぎ方を選ぶ">
+  <p class="cap">絵</p><div class="chips" id="chipsW"></div>
+  <p class="cap" style="margin-top:12px">形のちがい</p><div class="chips" id="chipsV"></div>
+  <p class="cap" style="margin-top:12px">言葉と絵の、つなぎ方</p><div class="chips" id="chipsM"></div>
+  <p class="cap" style="margin-top:12px">お手本の組の数（言葉ごと）</p><div class="chips" id="chipsK"></div>
+  <p class="cap" style="margin-top:12px">まちがってつけた言葉の数（言葉ごと）</p><div class="chips" id="chipsE"></div>
+</section>
+<section class="panel" aria-live="polite">
+  <p class="cap">① 絵を、2つの数字にする（上下にとなりあう黒マスの組＝たて数、左右にとなりあう黒マスの組＝よこ数）</p>
+  <div id="pic"></div>
+</section>
+<section class="panel" aria-live="polite">
+  <p class="cap">② 言葉と絵を、同じ地図に置く（右へ行くほど、たて数が多い。上へ行くほど、よこ数が多い）</p>
+  <div id="map"></div>
+  <p class="note" id="mapnote"></p>
+</section>
+<section class="panel" aria-live="polite">
+  <p class="cap">③ 絵にいちばん近い言葉を、答えにする</p>
+  <div id="cmp"></div>
+  <p class="ans2" id="ans"></p>
+  <p class="note" id="anote"></p>
+</section>
+<section class="panel" aria-live="polite">
+<p class="cap">④ 12通り（4つの絵×形のちがい3通り）の正解の数</p>
+<div id="mat"></div>
+</section>
+<details>
+<summary>お手本の組を見る（絵と、つけた言葉）</summary>
+<div class="exs" id="exs"></div>
+<p class="hint">赤い枠は、まちがって言葉をつけた組です。まちがいは、言葉ごとに、先頭の組から数えて、となりの言葉をつけています。</p>
+</details>
+<details>
+<summary>何をしているの？</summary>
+<p>絵は、6×6マスの白黒の絵です。言葉は、そのままでは、絵と比べられません。そこで、絵を「たて数」と「よこ数」の2つの数字にして、地図の上の1点にします。言葉も、地図の上の1点に置きます。置き方が「つなぎ方」です。「つなぐ前」は、言葉を、辞書の番号順に、適当に置いただけです。「つないだあと」は、お手本の組（絵と言葉のペア）をもとに、その言葉がついた絵の点の、真ん中（平均）に置きます。答えは、絵の点にいちばん近い言葉です。同点のときは、先に並んでいる言葉を答えにします。</p>
+</details>
+<details>
+<summary>どうして、お手本の組が大事なの？</summary>
+<p>言葉の置き場所を決める手がかりが、お手本の組だからです。組の言葉がまちがっていると、言葉が置かれる場所もずれて、絵と言葉が、うまく結びつかなくなります。</p>
+</details>
+<details>
+<summary>本物のAIとは、同じなの？</summary>
+<p>ちがいます。このアプリは、4つの言葉と、6×6マスの絵だけの、説明用の小さな例です。絵を2つの数字にする計算は、人が決めたもので、学習していません。本物は、絵を数字にする仕組みと、言葉を数字にする仕組みを、たくさんの組から学習して、同じ空間に置きます。実際のAIの結果ではありません。</p>
+</details>
+<div class="links">
+  <a href="../">かんたん版へ戻る</a>
+  <a href="../../">アプリ一覧へ</a>
+</div>
+<noscript><p>このアプリを動かすには、JavaScriptをオンにしてください。</p></noscript>
+<p class="copy">© 2026 KOBATO BOOKS</p>
+</main>
+<script>
+var DETAIL=true;
+var $=function(id){return document.getElementById(id);};
+var N=6;
+function blank(){var g=[];for(var r=0;r<N;r++){g.push([0,0,0,0,0,0]);}return g;}
+function vline(c,r0,L){var g=blank();for(var r=r0;r<r0+L;r++)g[r][c]=1;return g;}
+function hline(r,c0,L){var g=blank();for(var c=c0;c<c0+L;c++)g[r][c]=1;return g;}
+function frame(r0,c0,s){var g=blank();for(var i=0;i<s;i++){g[r0][c0+i]=1;g[r0+s-1][c0+i]=1;g[r0+i][c0]=1;g[r0+i][c0+s-1]=1;}return g;}
+function dots(p){var g=blank();p.forEach(function(q){g[q[0]][q[1]]=1;});return g;}
+function feat(g){var V=0,H=0,r,c;for(r=0;r<N-1;r++)for(c=0;c<N;c++)if(g[r][c]&&g[r+1][c])V++;for(r=0;r<N;r++)for(c=0;c<N-1;c++)if(g[r][c]&&g[r][c+1])H++;return [V,H];}
+var WORDS=["たて線","よこ線","わく","点"];
+var VN=["ふつう","ずらす","小さい（短い）"];
+var TEST=[[vline(2,0,6),vline(4,0,5),vline(1,1,4)],[hline(2,0,6),hline(4,1,5),hline(1,1,4)],[frame(0,0,6),frame(1,1,5),frame(1,2,4)],[dots([[2,2]]),dots([[4,1]]),dots([[1,4],[4,1]])]];
+var TRAIN=[
+ [vline(0,0,6),vline(5,0,6),vline(3,1,5),vline(1,0,4),vline(2,2,4),vline(4,0,3),vline(3,0,6),vline(0,2,3)],
+ [hline(0,0,6),hline(5,0,6),hline(3,1,5),hline(1,0,4),hline(2,2,4),hline(4,0,3),hline(3,0,6),hline(0,2,3)],
+ [frame(0,0,6),frame(0,0,5),frame(1,1,4),frame(2,2,4),frame(0,1,5),frame(1,0,3),frame(3,3,3),frame(0,0,4)],
+ [dots([[0,0]]),dots([[5,5]]),dots([[2,3]]),dots([[1,1],[4,4]]),dots([[0,5]]),dots([[3,0]]),dots([[2,2]]),dots([[5,1],[1,4]])]];
+var ARB=[[2,2],[4,4],[6,6],[8,8]];
+var KS=[2,4,8],ES=[0,1,2];
+var wi=1,vi=0,mi=0,ki=2,ei=0,pressed=false;
+function labelOf(w,i,m){return i<m?(w+1)%4:w;}
+function protos(k,m){var s=[[0,0,0],[0,0,0],[0,0,0],[0,0,0]];for(var w=0;w<4;w++)for(var i=0;i<k;i++){var l=labelOf(w,i,m),f=feat(TRAIN[w][i]);s[l][0]+=f[0];s[l][1]+=f[1];s[l][2]++;}return s.map(function(a){return a[2]?[a[0]/a[2],a[1]/a[2]]:null;});}
+function placement(method,k,m){return method===0?ARB:protos(k,m);}
+function judge(f,P){var d=P.map(function(p){return p?Math.sqrt(Math.pow(f[0]-p[0],2)+Math.pow(f[1]-p[1],2)):1e9;});var mn=Math.min.apply(null,d);var ties=[];d.forEach(function(x,i){if(Math.abs(x-mn)<1e-9)ties.push(i);});return {d:d,best:ties[0],ties:ties};}
+function fm(v){return (Math.round(v*100)/100).toString();}
+function f1(v){return (Math.round(v*10)/10).toFixed(1);}
+function gridHTML(g){var s='<div class="grid" style="--n:6">';for(var r=0;r<N;r++)for(var c=0;c<N;c++)s+='<div class="px'+(g[r][c]?' dk':'')+'" style="--v:'+(g[r][c]?9:0)+'"></div>';return s+'</div>';}
+function chips(id,arr,set){arr.forEach(function(n,i){var b=document.createElement("button");b.type="button";b.className="chip";b.textContent=n;b.addEventListener("click",function(){set(i);pressed=false;render();});$(id).appendChild(b);});}
+function setP(id,cur){var cs=$(id).children;for(var k=0;k<cs.length;k++)cs[k].setAttribute("aria-pressed",k===cur?"true":"false");}
+function mapSVG(P,f,best){var W=320,H=250,L=34,B=30,T=10,R=14,mx=11;function X(v){return L+v/mx*(W-L-R);}function Y(v){return H-B-v/mx*(H-B-T);}
+ var s='<svg class="mp" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="言葉と絵を置いた地図">';
+ for(var i=0;i<=10;i+=2){s+='<line class="gl" x1="'+X(i)+'" x2="'+X(i)+'" y1="'+Y(0)+'" y2="'+Y(mx)+'"/><line class="gl" y1="'+Y(i)+'" y2="'+Y(i)+'" x1="'+X(0)+'" x2="'+X(mx)+'"/><text class="s" x="'+X(i)+'" y="'+(H-B+12)+'" text-anchor="middle">'+i+'</text><text class="s" x="'+(L-5)+'" y="'+(Y(i)+3)+'" text-anchor="end">'+i+'</text>';}
+ s+='<line class="ax" x1="'+X(0)+'" x2="'+X(mx)+'" y1="'+Y(0)+'" y2="'+Y(0)+'"/><line class="ax" x1="'+X(0)+'" x2="'+X(0)+'" y1="'+Y(0)+'" y2="'+Y(mx)+'"/>';
+ s+='<text x="'+(X(mx)-2)+'" y="'+(H-4)+'" text-anchor="end" class="s">たて数</text><text x="2" y="'+(T+4)+'" class="s">よこ数</text>';
+ var bp=P[best];if(bp)s+='<line class="ln" x1="'+X(f[0])+'" y1="'+Y(f[1])+'" x2="'+X(bp[0])+'" y2="'+Y(bp[1])+'"/>';
+ P.forEach(function(p,i){if(!p)return;s+='<circle class="wd'+(i===best?' win':'')+'" cx="'+X(p[0])+'" cy="'+Y(p[1])+'" r="5"/><text x="'+(X(p[0])+8)+'" y="'+(Y(p[1])-6)+'">'+WORDS[i]+'</text>';});
+ s+='<circle class="pic" cx="'+X(f[0])+'" cy="'+Y(f[1])+'" r="6.5"/><text x="'+(X(f[0])+9)+'" y="'+(Y(f[1])+14)+'" style="fill:var(--warn)">この絵</text>';
+ return s+'</svg>';}
+function render(){setP("chipsW",wi);setP("chipsV",vi);setP("chipsM",mi);var k=KS[ki],m=ES[ei];if(DETAIL){setP("chipsK",ki);setP("chipsE",ei);}
+ var g=TEST[wi][vi],f=feat(g);
+ $("pic").innerHTML='<div class="big">'+gridHTML(g)+'<div><div class="pair">（'+f[0]+'，'+f[1]+'）</div><p class="note" style="margin:0">たて数 '+f[0]+'、よこ数 '+f[1]+'<br>この絵の「数字の組」です。</p></div></div>';
+ if(!pressed){$("map").innerHTML='<p class="note">「言葉と絵を、つないで探す」を押してください。</p>';$("mapnote").textContent="";$("cmp").innerHTML='<p class="note">押すと、4つの言葉と、この絵の「地図の上の遠さ」が出ます。小さいほど、近い言葉です。</p>';$("ans").textContent="";$("ans").className="ans2";$("anote").textContent="";if(DETAIL)detailParts();return;}
+ var P=placement(mi,k,m),j=judge(f,P);
+ $("map").innerHTML=mapSVG(P,f,j.best);
+ $("mapnote").textContent=mi===0?"つなぐ前：言葉は、辞書の番号順に、適当に置いただけです。絵とは関係なく、ななめに並んでいます。":"つないだあと：言葉は、その言葉がついた絵（"+k+"枚×4言葉の組）の点の、真ん中に置きました"+(m>0?"（そのうち、言葉ごとに"+m+"組は、まちがった言葉がついています）":"")+"。";
+ var t='<div class="tablewrap"><table class="cmpt"><tr><th>言葉</th><th>言葉の位置</th><th>絵との遠さ</th></tr>';
+ WORDS.forEach(function(w,i){t+='<tr'+(j.ties.indexOf(i)>=0?' class="win2"':'')+'><th>'+w+'</th><td>'+(P[i]?'（'+fm(P[i][0])+'，'+fm(P[i][1])+'）':'―')+'</td><td>'+(P[i]?f1(j.d[i]):'―')+'</td></tr>';});
+ $("cmp").innerHTML=t+'</table></div>';
+ var ok=j.best===wi;$("ans").className="ans2"+(ok?"":" ng");
+ $("ans").textContent="AIの答え："+WORDS[j.best]+(ok?"（正解）":"（まちがい。正解は"+WORDS[wi]+"）");
+ $("anote").textContent=j.ties.length>1?"同点が"+j.ties.length+"つ（"+j.ties.map(function(q){return WORDS[q];}).join("・")+"）あるので、先に並んでいる言葉を答えにしました。":"遠さは、地図の上の直線の長さです。";
+ if(DETAIL)detailParts();}
+function detailParts(){var k=KS[ki],m=ES[ei],h='<div class="tablewrap"><table class="mat"><tr><th rowspan="2">絵</th><th colspan="3">つなぐ前</th><th colspan="3">つないだあと</th></tr><tr><th>ふつう</th><th>ずらす</th><th>小さい</th><th>ふつう</th><th>ずらす</th><th>小さい</th></tr>',tot=[0,0];
+ for(var w=0;w<4;w++){h+='<tr><th>'+WORDS[w]+'</th>';for(var mm=0;mm<2;mm++){var P=placement(mm,k,m);for(var v=0;v<3;v++){var j=judge(feat(TEST[w][v]),P),ok=j.best===w;tot[mm]+=ok?1:0;h+='<td class="'+(ok?'ok':'ng')+'">'+(ok?'○':WORDS[j.best]+'×')+'</td>';}}h+='</tr>';}
+ $("mat").innerHTML=h+'</table></div><p class="sumline">12通りのうち正解：つなぐ前 '+tot[0]+'／つないだあと '+tot[1]+'（お手本 '+k+'組×4言葉、まちがい '+m+'組ずつ）</p>';
+ var e='';for(var w2=0;w2<4;w2++)for(var i=0;i<k;i++){var l=labelOf(w2,i,m),bad=l!==w2;e+='<div class="ex'+(bad?' bad':'')+'">'+gridHTML(TRAIN[w2][i])+'<small>'+WORDS[l]+'</small></div>';}
+ $("exs").innerHTML=e;}
+chips("chipsW",WORDS.map(function(w,i){return ["たて線","よこ線","わく","点"][i];}),function(i){wi=i;});
+chips("chipsV",VN,function(i){vi=i;});
+chips("chipsM",["つなぐ前","つないだあと"],function(i){mi=i;});
+if(DETAIL){chips("chipsK",["2組","4組","8組"],function(i){ki=i;});chips("chipsE",["0組","1組","2組"],function(i){ei=i;});}
+$("go").addEventListener("click",function(){pressed=true;render();});
+render();
+</script>
+</body>
+</html>
